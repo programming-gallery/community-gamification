@@ -20,12 +20,12 @@ export class Crawler extends cdk.Construct {
 
   constructor(scope: cdk.Construct, id: string, props: CrawlerProps = {}) {
     super(scope, id);
-    const { 
+    const {
       vpc,
       visibilityTimeout = cdk.Duration.seconds(300), 
       cluster = new ecs.Cluster(this, 'Cluster', { vpc }) 
     } = props;
-    const cluster = props.cluster || new ecs.Cluster(stack, 'Cluster', { vpc });
+    const cluster = props.cluster;
     const table = new dynamodb.Table(this, 'Table', {
       partitionKey: {
         name: 'id',
@@ -47,16 +47,21 @@ export class Crawler extends cdk.Construct {
       schedule: events.Schedule.expression('rate(1 minute)'),
       desiredTaskCount: 1,
       scheduledFargateTaskImageOptions: {
-        image: ecs.ContainerImage.fromAsset(path.resolve(__dirname, 'cralwer-image')),
+        image: ecs.ContainerImage.fromAsset(path.resolve(__dirname, 'crawler-image')),
         memoryLimitMiB: 256,
-        environment: { 
+        environment: {
           NORMAL_QUEUE_ARN: normalQueue.queueArn,
           PRIORITY_QUEUE_ARN: priorityQueue.queueArn,
           RESULT_QUEUE_ARN: resultQueue.queueArn,
         },
       },
     });
-    dynamoTable.grantReadWriteData(d
-    this.queueArn = queue.queueArn;
+    table.grantReadWriteData(task.taskDefinition.taskRole);
+    priorityQueue.grantConsumeMessages(task.taskDefinition.taskRole);
+    priorityQueue.grantPublishMessages(task.taskDefinition.taskRole);
+    normalQueue.grantConsumeMessages(task.taskDefinition.taskRole);
+    normalQueue.grantPublishMessages(task.taskDefinition.taskRole);
+    resultQueue.grantPublishMessages(task.taskDefinition.taskRole);
+    this.queueArn = resultQueue.queueArn;
   }
 }

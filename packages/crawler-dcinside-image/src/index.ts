@@ -15,7 +15,7 @@ export async function main(){
   let awsConfig = undefined;
   if(AWS_CONFIG !== undefined)
     awsConfig = JSON.parse(AWS_CONFIG);
-  const worker = new Worker();
+  const worker = new DcinsideWorker();
   const manager = new Manager(PRIORITY_QUEUE_URL, NORMAL_QUEUE_URL, RESULT_QUEUE_URL, HISTORY_TABLE_NAME, worker, { priorityWorkCount: 10, normalWorkCount: 1, awsConfig: awsConfig });
   await manager.manage();
 }

@@ -1,10 +1,10 @@
 {
-  "name": "@community-gamification/crawler-cdk-construct",
-  "version": "0.0.2-alpha.0",
+  "name": "@programming-gallery/cdk-crawler-construct",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
-    "directory": "packages/crawler-cdk-construct"
+    "directory": "packages/cdk-crawler-construct"
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

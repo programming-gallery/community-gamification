@@ -1,6 +1,6 @@
 {
   "name": "@programming-gallery/cdk-stack",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@aws-cdk/core": "1.54.0",
-    "@programming-gallery/crawler-cdk-stack": "^0.0.1",
+    "@programming-gallery/cdk-crawler-construct": "0.0.1",
     "source-map-support": "^0.5.16"
   }
 }

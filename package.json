@@ -1,11 +1,13 @@
 {
   "name": "root",
-  "private": true,
   "devDependencies": {
     "lerna": "^3.22.1"
   },
+  "packages": [ "packages/*" ],
   "scripts": {
     "compile": "lerna run compile",
-    "publish": "lerna publish"
+    "publish": "lerna publish",
+    "clean": "lerna clean",
+    "install": "lerna bootstrap"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@programming-gallery/crawler-dcinside-image",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.0",
   "description": "",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -27,6 +27,6 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@programming-gallery/crawler-core": "0.0.1"
+    "@programming-gallery/crawler-core": "^0.0.2-alpha.0"
   }
 }

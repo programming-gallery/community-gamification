@@ -1,14 +1,14 @@
 {
   "name": "@programming-gallery/crawler-core",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.0",
   "description": "",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "files": [
     "build/src"
   ],
-  "repository" : {
-    "type" : "git",
+  "repository": {
+    "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
     "directory": "packages/crawker-core"
   },

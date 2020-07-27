@@ -1,0 +1,173 @@
+import {
+  attribute,
+  hashKey,
+  rangeKey,
+  table,
+} from '@aws/dynamodb-data-mapper-annotations';
+import { ExpressionAttributes, equals, AttributePath, AttributeValue, ConditionExpression, FunctionExpression, ConditionExpressionPredicate } from '@aws/dynamodb-expressions';
+import { DataMapper } from '@aws/dynamodb-data-mapper';
+import DynamoDB = require('aws-sdk/clients/dynamodb');
+
+export { Mapper };
+
+interface HistoryDbParams {
+  awsConfig?: any;
+  weight?: number;
+}
+
+class HistoryDb {
+  HistoryConstructor: { 
+    new(): History
+  };
+  Mapper: DataMapper;
+  constructor(name: string, params: HistoryDbParams = { weight: 0.2 }) {
+    this.Mapper = new DataMapper({ client: new DynamoDB(params.awsConfig) });
+    @table(name)
+    class History {
+      /**
+       * gallery id ex) programming
+       */
+      @hashKey()
+      public id: string = '';
+
+      @attribute()
+      public isMiner?: number;
+
+      @attribute()
+      public lastPostedDocumentId?: string;
+
+      /**
+       * Last crawled documents posting time
+       */
+      @attribute()
+      public lastPostedTimestamp?: number;
+
+      /**
+       * Posting Frequency Exponential Average
+       */
+      @attribute()
+      public postingFrequencyEA?: number;
+
+      /**
+       * Random generated crawling task tracking key.
+       * In some cases, there are multiple tasks of same target gallery could queing in the queue
+       * In that case, we track only valid one and discard the others.
+       * If a task has the same tracking key in the table, we assume the task is valid.
+       */
+      @attribute()
+      public trackingKey?: number;
+
+      static async getOrCreate(id: string): Promise<History> {
+        try {
+          let history: History = await Mapper.get(Object.assign(new History, {id}));
+          return history;
+        } catch (e) {
+          if(e.name !== 'ItemNotFoundException')
+            throw e;
+          let history = new History();
+          history.id = id;
+          return history;
+        }
+      }
+      static isPriority(history: History): boolean {
+        if(history.postingFrequencyEA === undefined) return true;
+        else if((history.postingFrequencyEA || 0) > 1/3600) return true;
+        else return false;
+      }
+      /**
+       * Update history. the changes are not saved. To save, invoke save method.
+       */
+      static update(history: History, documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string) {
+        let frequency = documentCount*1000 / ((lastPostedTimestamp - (history.lastPostedTimestamp || firstPostedTimestamp)) || Infinity);
+        history.postingFrequencyEA = history.postingFrequencyEA !== undefined? history.postingFrequencyEA * (1 - WEIGHT) + frequency * WEIGHT : frequency;
+        history.lastPostedTimestamp = lastPostedTimestamp;
+        history.lastPostedDocumentId = lastPostedDocumentId || history.lastPostedDocumentId;
+      }
+      /**
+       * Save with a tracking key. it might fail if another worker update the same history.
+       *
+       * @returns The result of update(true or false)
+       */
+      static async save(history: History, trackingKey: number): Promise<boolean> {
+        let originalTrackingKey = history.trackingKey;
+        history.trackingKey = trackingKey;
+        const condition = originalTrackingKey === undefined? 
+          new FunctionExpression('attribute_not_exists', new AttributePath('trackingKey')): 
+          { 
+            type: 'Or',
+            conditions: [
+              new FunctionExpression('attribute_not_exists', new AttributePath('trackingKey')),
+              { ...equals(originalTrackingKey), subject: new AttributePath('trackingKey') },
+            ],
+          } as ConditionExpression;
+        try {
+          const attributes = new ExpressionAttributes();
+          await Mapper.put(history, {
+            condition,
+          });
+        } catch(e) {
+          if(e.code === 'ConditionalCheckFailedException')
+            return false;
+          else throw e;
+        }
+        return true;
+      }
+    }
+    this.HistoryConstructor = History;
+  }
+  static async getOrCreate(id: string): Promise<History> {
+    try {
+      let history: History = await Mapper.get(Object.assign(new History, {id}));
+      return history;
+    } catch (e) {
+      if(e.name !== 'ItemNotFoundException')
+        throw e;
+      let history = new History();
+      history.id = id;
+      return history;
+    }
+  }
+  static isPriority(history: History): boolean {
+    if(history.postingFrequencyEA === undefined) return true;
+    else if((history.postingFrequencyEA || 0) > 1/3600) return true;
+    else return false;
+  }
+  /**
+   * Update history. the changes are not saved. To save, invoke save method.
+   */
+  static update(history: History, documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string) {
+    let frequency = documentCount*1000 / ((lastPostedTimestamp - (history.lastPostedTimestamp || firstPostedTimestamp)) || Infinity);
+    history.postingFrequencyEA = history.postingFrequencyEA !== undefined? history.postingFrequencyEA * (1 - WEIGHT) + frequency * WEIGHT : frequency;
+    history.lastPostedTimestamp = lastPostedTimestamp;
+    history.lastPostedDocumentId = lastPostedDocumentId || history.lastPostedDocumentId;
+  }
+  /**
+   * Save with a tracking key. it might fail if another worker update the same history.
+   *
+   * @returns The result of update(true or false)
+   */
+  static async save(history: History, trackingKey: number): Promise<boolean> {
+    let originalTrackingKey = history.trackingKey;
+    history.trackingKey = trackingKey;
+    const condition = originalTrackingKey === undefined? 
+      new FunctionExpression('attribute_not_exists', new AttributePath('trackingKey')): 
+      { 
+        type: 'Or',
+        conditions: [
+          new FunctionExpression('attribute_not_exists', new AttributePath('trackingKey')),
+          { ...equals(originalTrackingKey), subject: new AttributePath('trackingKey') },
+        ],
+      } as ConditionExpression;
+    try {
+      const attributes = new ExpressionAttributes();
+      await Mapper.put(history, {
+        condition,
+      });
+    } catch(e) {
+      if(e.code === 'ConditionalCheckFailedException')
+        return false;
+      else throw e;
+    }
+    return true;
+  }
+}

@@ -16,7 +16,7 @@ export interface CrawlerProps {
 }
 
 export class Crawler extends cdk.Construct {
-  public readonly queueArn: string;
+  public readonly queue: sqs.Queue;
 
   constructor(scope: cdk.Construct, id: string, props: CrawlerProps = {}) {
     super(scope, id);
@@ -50,9 +50,10 @@ export class Crawler extends cdk.Construct {
         image: ecs.ContainerImage.fromAsset(path.resolve(__dirname, 'crawler-image')),
         memoryLimitMiB: 256,
         environment: {
-          NORMAL_QUEUE_ARN: normalQueue.queueArn,
-          PRIORITY_QUEUE_ARN: priorityQueue.queueArn,
-          RESULT_QUEUE_ARN: resultQueue.queueArn,
+          NORMAL_QUEUE_ARN: normalQueue.queueUrl,
+          PRIORITY_QUEUE_ARN: priorityQueue.queueUrl,
+          RESULT_QUEUE_ARN: resultQueue.queueUrl,
+          TABLE_NAME: table.tableName,
         },
       },
     });
@@ -62,6 +63,6 @@ export class Crawler extends cdk.Construct {
     normalQueue.grantConsumeMessages(task.taskDefinition.taskRole);
     normalQueue.grantPublishMessages(task.taskDefinition.taskRole);
     resultQueue.grantPublishMessages(task.taskDefinition.taskRole);
-    this.queueArn = resultQueue.queueArn;
+    this.queue = resultQueue;
   }
 }

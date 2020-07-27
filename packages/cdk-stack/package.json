@@ -29,5 +29,6 @@
     "@aws-cdk/core": "1.54.0",
     "@programming-gallery/cdk-crawler-construct": "0.0.1",
     "source-map-support": "^0.5.16"
-  }
+  },
+  "gitHead": "c61df1aa3b80a7be54656061185e4b504fb2f555"
 }

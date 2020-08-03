@@ -1,6 +1,6 @@
 {
   "name": "@programming-gallery/cdk-crawler-construct",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.2-alpha.1",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
@@ -35,5 +35,5 @@
     "@aws-cdk/aws-sqs": "1.56.0",
     "@aws-cdk/core": "1.56.0"
   },
-  "gitHead": "c61df1aa3b80a7be54656061185e4b504fb2f555"
+  "gitHead": "e6fd3b0d01a0968df530499de7fc7a327ae88b44"
 }

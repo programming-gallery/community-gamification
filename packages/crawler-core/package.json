@@ -38,5 +38,6 @@
     "@aws/dynamodb-expressions": "^0.7.3",
     "aws-sdk": "^2.720.0",
     "sqsqs": "^0.2.8"
-  }
+  },
+  "gitHead": "e6fd3b0d01a0968df530499de7fc7a327ae88b44"
 }

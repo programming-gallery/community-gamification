@@ -7,27 +7,32 @@
     "directory": "packages/cdk-stack"
   },
   "bin": {
-    "cdk-stack": "bin/cdk-stack.js"
+    "cg": "bin/cg.js"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
+    "deploy": "cdk deploy",
     "test": "jest",
+    "synth": "cdk synth",
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.54.0",
+    "@aws-cdk/assert": "1.56.0",
     "@types/jest": "^25.2.1",
     "@types/node": "10.17.5",
-    "aws-cdk": "1.54.0",
+    "aws-cdk": "1.56.0",
     "jest": "^25.5.0",
     "ts-jest": "^25.3.1",
     "ts-node": "^8.1.0",
     "typescript": "~3.7.2"
   },
   "dependencies": {
-    "@aws-cdk/core": "1.54.0",
-    "@programming-gallery/cdk-crawler-construct": "0.0.1",
+    "@aws-cdk/aws-dynamodb": "^1.56.0",
+    "@aws-cdk/aws-ec2": "1.56.0",
+    "@aws-cdk/aws-ecs": "^1.56.0",
+    "@aws-cdk/core": "1.56.0",
+    "@programming-gallery/cdk-crawler-construct": "*",
     "source-map-support": "^0.5.16"
   },
   "gitHead": "c61df1aa3b80a7be54656061185e4b504fb2f555"

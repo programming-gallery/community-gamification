@@ -1,6 +1,7 @@
 import { buildHistory } from '../src/history';
 
 const History = buildHistory('test', {'endpoint': 'http://localhost:4566', 'region': 'ap-northeast-2'});
+//const History = buildHistory('test', {})// {'region': 'ap-northeast-2'});
 
 describe('history', () => {
   beforeEach(async () => {

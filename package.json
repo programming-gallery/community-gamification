@@ -3,11 +3,16 @@
   "devDependencies": {
     "lerna": "^3.22.1"
   },
-  "packages": [ "packages/*" ],
+  "packages": [
+    "packages/*"
+  ],
   "scripts": {
     "compile": "lerna run compile",
     "publish": "lerna publish",
     "clean": "lerna clean",
+    "bootstrap": "lerna bootstrap",
+    "test": "lerna run test",
     "install": "lerna bootstrap"
-  }
+  },
+  "dependencies": {}
 }

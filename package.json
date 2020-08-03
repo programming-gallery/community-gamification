@@ -13,6 +13,5 @@
     "bootstrap": "lerna bootstrap",
     "test": "lerna run test",
     "install": "lerna bootstrap"
-  },
-  "dependencies": {}
+  }
 }

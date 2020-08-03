@@ -63,7 +63,7 @@ describe('manager', () => {
       normalQueue.option.QueueUrl, 
       historyTableName,
       new MockedWorker(), 
-      { priorityWorkCount: 1, 
+      { priorityWorkCount: 3, 
         normalWorkCount: 1,
         awsConfig });
     await manager.manage();

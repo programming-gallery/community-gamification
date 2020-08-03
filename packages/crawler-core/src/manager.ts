@@ -28,6 +28,7 @@ export class Manager {
     }, options.awsConfig);
     this.priorityQueue = new Queue({
       QueueUrl: priorityQueueUrl,
+      WaitTimeSeconds: 1,
     }, options.awsConfig);
     this.worker = worker;
     this.priorityWorkCount = options.priorityWorkCount || 10; 
@@ -35,7 +36,8 @@ export class Manager {
     this.HistoryConstructor = buildHistory(historyTableName, options.awsConfig);
   }
   async manage(){
-    const messages = (await Promise.all([this.priorityQueue.receive(this.priorityWorkCount), this.normalQueue.receive(this.normalWorkCount)])).flat();
+    let promises = [this.priorityQueue.receive(this.priorityWorkCount), this.normalQueue.receive(this.normalWorkCount)]
+    const messages = (await Promise.all(promises)).flat();
     if(messages == null || messages.length === 0)
       return;
     const contracts: Contract[] = messages.map(message => JSON.parse(message.Body!));
@@ -57,7 +59,7 @@ export class Manager {
     });
     await this.normalQueue.send(normalContracts.map(c => JSON.stringify(c)));
     await this.priorityQueue.send(priorityContracts.map(c => JSON.stringify(c)));
-    await this.priorityQueue.delete(messages.slice(0, this.priorityWorkCount));
-    await this.normalQueue.delete(messages.slice(this.priorityWorkCount));
+    await this.priorityQueue.delete(await promises[0]);
+    await this.normalQueue.delete(await promises[1]);
   }
 }

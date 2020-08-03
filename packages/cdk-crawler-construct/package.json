@@ -35,5 +35,5 @@
     "@aws-cdk/aws-sqs": "1.56.0",
     "@aws-cdk/core": "1.56.0"
   },
-  "gitHead": "e6fd3b0d01a0968df530499de7fc7a327ae88b44"
+  "gitHead": "e7d8437604500b959994cdcb6bc9866865ef8c1e"
 }

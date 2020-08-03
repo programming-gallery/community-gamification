@@ -1,3 +1,12 @@
+/**
+ * Required enviroment variables:
+ * @param CONTRACT_QUEUE_URL, 
+ * @param CACHE_TABLE_NAME,
+ *
+ * Optional enviroment variables:
+ * @param AWS_CONFIG,
+ */
+
 const Crawler = require('dcinside-crawler').default;
 const crawler = new Crawler();
 function chunk(arr, chunk_size) {

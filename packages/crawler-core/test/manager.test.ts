@@ -45,12 +45,10 @@ describe('manager', () => {
   let History = buildHistory(historyTableName, {'endpoint': 'http://localhost:4566', 'region': 'ap-northeast-2'});
   let normalQueue: Queue;
   let priorityQueue: Queue;
-  let resultQueue: Queue;
   beforeEach(async () => {
     await History.createTable({readCapacityUnits: 5, writeCapacityUnits: 5});
     normalQueue = await Queue.createQueue('normalQueue', awsConfig, undefined, undefined, {WaitTimeSeconds: 1});
     priorityQueue = await Queue.createQueue('priorityQueue', awsConfig, undefined, undefined, {WaitTimeSeconds: 1});
-    resultQueue = await Queue.createQueue('resultQueue', awsConfig);
     await normalQueue.send([JSON.stringify({id: "1", trackingKey: 1})]);
     await priorityQueue.send([JSON.stringify({id: "2", trackingKey: 2})]);
   });
@@ -58,25 +56,17 @@ describe('manager', () => {
     await History.deleteTable();
     await normalQueue.deleteQueue();
     await priorityQueue.deleteQueue();
-    await resultQueue.deleteQueue();
   });
   it('manage', async () => {
     let manager = new Manager(
       priorityQueue.option.QueueUrl, 
       normalQueue.option.QueueUrl, 
-      resultQueue.option.QueueUrl, 
       historyTableName,
       new MockedWorker(), 
       { priorityWorkCount: 1, 
         normalWorkCount: 1,
         awsConfig });
     await manager.manage();
-    let results = await resultQueue.receive(2);
-    //results = results.concat(await resultQueue.receive(1));
-    expect(results.map(r => r.Body).sort()).toEqual([
-      JSON.stringify(priorityResult),
-      JSON.stringify(normalResult)
-    ]);
     let normalContract2 = JSON.parse((await normalQueue.receive(1))[0].Body!);
     expect(normalContract2.id).toEqual("2");
     expect(normalContract2.trackingKey).not.toEqual(2);
@@ -91,8 +81,8 @@ describe('manager', () => {
   it('duplicated message concurrency', async () => {
     await priorityQueue.send([JSON.stringify({id: "1", trackingKey: 1})]);
     await normalQueue.send([JSON.stringify({id: "2", trackingKey: 4})]);
-    let manager1 = new Manager(priorityQueue.option.QueueUrl, normalQueue.option.QueueUrl, resultQueue.option.QueueUrl, historyTableName, new MockedWorker(), { priorityWorkCount: 1, awsConfig });
-    let manager2 = new Manager(priorityQueue.option.QueueUrl, normalQueue.option.QueueUrl, resultQueue.option.QueueUrl, historyTableName, new MockedWorker(), { priorityWorkCount: 1, awsConfig });
+    let manager1 = new Manager(priorityQueue.option.QueueUrl, normalQueue.option.QueueUrl, historyTableName, new MockedWorker(), { priorityWorkCount: 1, awsConfig });
+    let manager2 = new Manager(priorityQueue.option.QueueUrl, normalQueue.option.QueueUrl, historyTableName, new MockedWorker(), { priorityWorkCount: 1, awsConfig });
     await Promise.all([manager1.manage(), manager2.manage()]);
     let res = await normalQueue.receive(2);
     expect(res.length).toEqual(1);
@@ -108,17 +98,9 @@ describe('manager', () => {
     expect(history2.data).toEqual({"id": "2", "lastPostedDocumentId": "4", "lastPostedTimestamp": 7200*1000, "postingFrequencyEA": 2/7200, "trackingKey": normalContract2.trackingKey});
   });
   it('manage two cycle', async () => {
-    let manager = new Manager(priorityQueue.option.QueueUrl, normalQueue.option.QueueUrl, resultQueue.option.QueueUrl, historyTableName, new MockedWorker(), { priorityWorkCount: 1, awsConfig });
+    let manager = new Manager(priorityQueue.option.QueueUrl, normalQueue.option.QueueUrl, historyTableName, new MockedWorker(), { priorityWorkCount: 1, awsConfig });
     await manager.manage();
     await manager.manage();
-    let results = await resultQueue.receive(4);
-    //results = results.concat(await resultQueue.receive(1));
-    expect(results.map(r => r.Body).sort()).toEqual([
-      JSON.stringify(priorityResult),
-      JSON.stringify(priorityResult),
-      JSON.stringify(normalResult),
-      JSON.stringify(normalResult)
-    ]);
     let normalContract2 = JSON.parse((await normalQueue.receive(1))[0].Body!);
     expect(normalContract2.id).toEqual("2");
     expect(normalContract2.trackingKey).not.toEqual(2);

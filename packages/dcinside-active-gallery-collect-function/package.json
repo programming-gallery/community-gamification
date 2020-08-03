@@ -1,6 +1,11 @@
 {
-  "name": "dcinside-active-gallery-collect-function",
-  "version": "1.0.0",
+  "name": "@programming-gallery/dcinside-active-gallery-collect-function",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
+    "directory": "packages/dcinside-active-gallery-collect-function"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {

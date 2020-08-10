@@ -37,14 +37,20 @@ describe('dcinside-worker', () => {
       HISTORY_TABLE_NAME: historyTableName,
       AWS_CONFIG: JSON.stringify(awsConfig),
     };
-    priorityQueue.send([JSON.stringify({id: 'programming', trackingKey: 1 })]);
-    normalQueue.send([JSON.stringify({id: 'programming', trackingKey: 1 })]);
+    priorityQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
+    normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
     await main();
     let docs: Document[] = [];
     for await (const doc of dataMapper.scan(Document)) {
       docs.push(doc);
     }
-    expect(docs.length).toEqual(1000);
+    expect(docs.length).toEqual(100);
+    await main();
+    docs = [];
+    for await (const doc of dataMapper.scan(Document)) {
+      docs.push(doc);
+    }
+    expect(docs.length).toBeGreaterThanOrEqual(101);
     /*
     let res = await resultQueue.receive(200);
     expect(JSON.parse(res[0].Body || "[]").length).toEqual(100);

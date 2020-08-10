@@ -36,7 +36,7 @@ export interface IHistory {
   /**
    * Update history. the changes are not saved. To save, invoke save method.
    */
-  update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string): void; 
+  update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string, weight?: number): void ;
   /**
    * Save with a tracking key. it might fail if another worker update the same history.
    *
@@ -51,7 +51,7 @@ export interface IHistoryConstructor {
   deleteTable(): Promise<any>;
 }
 
-export function buildHistory (tableName: string, awsConfig: any, weight: number = 0.2): IHistoryConstructor {
+export function buildHistory (tableName: string, awsConfig: any, _weight: number = 0.2): IHistoryConstructor {
   @table(tableName)
   class DataModel implements IDataModel {
     @hashKey()
@@ -98,9 +98,11 @@ export function buildHistory (tableName: string, awsConfig: any, weight: number 
     isValid(trackingKey: number): boolean { 
       return this.data.trackingKey === undefined || this.data.trackingKey === trackingKey;
     }
-    update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string) {
+    update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string, weight?: number) {
+      if(weight === undefined)
+        weight = _weight;
       let history = this.data;
-      let frequency = documentCount*1000 / ((lastPostedTimestamp - (history.lastPostedTimestamp || firstPostedTimestamp)) || Infinity);
+      let frequency = documentCount*1000 / ((new Date().getTime() - firstPostedTimestamp) || Infinity);
       history.postingFrequencyEA = history.postingFrequencyEA !== undefined? history.postingFrequencyEA * (1 - weight) + frequency * weight : frequency;
       history.lastPostedTimestamp = lastPostedTimestamp;
       history.lastPostedDocumentId = lastPostedDocumentId || history.lastPostedDocumentId;

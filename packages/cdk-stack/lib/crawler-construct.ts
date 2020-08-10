@@ -7,6 +7,7 @@ import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as awsEcsPatterns from '@aws-cdk/aws-ecs-patterns';
 import * as path from 'path';
+import * as iam from '@aws-cdk/aws-iam';
 
 export interface CrawlerProps {
   /**
@@ -37,7 +38,7 @@ export interface CrawlerProps {
   /**
    * Memory limit Mib
    *
-   * @default 256
+   * @default 512
    */
   memoryLimitMiB?: number;
   /**
@@ -65,15 +66,20 @@ export interface CrawlerProps {
 }
 
 export class Crawler extends cdk.Construct {
-  public readonly queue: sqs.Queue;
+  public readonly priorityQueue: sqs.Queue;
+  public readonly normalQueue: sqs.Queue;
+  public readonly taskRole: iam.IRole;
   static cacheTable: dynamodb.Table; 
   constructor(scope: cdk.Construct, id: string, props: CrawlerProps) {
     super(scope, id);
+    if(process.env.GITHUB_TOKEN === undefined)
+      throw Error('GITHUB_TOKEN env var must provide(github token to access github repository)');
     if(Crawler.cacheTable! === undefined) {
       Crawler.cacheTable = new dynamodb.Table(this, 'CacheTable', {
         partitionKey: { name: "key", type: dynamodb.AttributeType.STRING },
         timeToLiveAttribute: "expireAt",
         billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+        removalPolicy: cdk.RemovalPolicy.DESTROY, 
       });
     }
     if(props === undefined || (props.vpc === undefined && props.cluster === undefined) || props.image === undefined || props.desiredTaskCount === undefined)
@@ -84,18 +90,19 @@ export class Crawler extends cdk.Construct {
       image,
       visibilityTimeout = cdk.Duration.seconds(300), 
       cluster = new ecs.Cluster(this, 'Cluster', { vpc }) ,
-      memoryLimitMiB = 256,
+      memoryLimitMiB = 512,
       cpu = 256,
       rps = 10,
       retries = 10,
       environment = {},
     } = props;
-    const historyTable = new dynamodb.Table(this, 'Table', {
+    const historyTable = new dynamodb.Table(this, 'HistoryTable', {
       partitionKey: {
         name: 'id',
         type: dynamodb.AttributeType.STRING
       },
       removalPolicy: cdk.RemovalPolicy.DESTROY, 
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
     const priorityQueue = new sqs.Queue(this, 'PriorityQueue', {
       visibilityTimeout,
@@ -108,7 +115,11 @@ export class Crawler extends cdk.Construct {
       cpu,
     })
     taskDefinition.addContainer("Container", {
-      image: ecs.ContainerImage.fromAsset(image), 
+      image: ecs.ContainerImage.fromAsset(image, {
+        buildArgs: {
+          GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+        },
+      }), 
       logging: new ecs.AwsLogDriver({
         streamPrefix: id,
       }),
@@ -155,5 +166,8 @@ export class Crawler extends cdk.Construct {
     priorityQueue.grantSendMessages(taskDefinition.taskRole);
     normalQueue.grantConsumeMessages(taskDefinition.taskRole);
     normalQueue.grantSendMessages(taskDefinition.taskRole);
+    this.taskRole = taskDefinition.taskRole;
+    this.priorityQueue = priorityQueue;
+    this.normalQueue = normalQueue;
   }
 }

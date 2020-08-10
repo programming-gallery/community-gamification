@@ -6,7 +6,6 @@
  * Optional enviroment variables:
  * @param AWS_CONFIG,
  */
-
 const Crawler = require('dcinside-crawler').default;
 const crawler = new Crawler();
 function chunk(arr, chunk_size) {
@@ -21,10 +20,10 @@ if(CONTRACT_QUEUE_URL == undefined || CACHE_TABLE_NAME == undefined)
 const Queue = require('sqsqs').default;
 const contactQueue = new Queue({
   QueueUrl: CONTRACT_QUEUE_URL,
-}, JSON.parse(AWS_CONFIG));
+}, AWS_CONFIG && JSON.parse(AWS_CONFIG));
 
 const aws = require("aws-sdk");
-const cacheTable = new aws.DynamoDB.DocumentClient(JSON.parse(AWS_CONFIG));
+const cacheTable = new aws.DynamoDB.DocumentClient(AWS_CONFIG && JSON.parse(AWS_CONFIG));
 const CACHE_DURATION = 3600*24*3
 async function cacheRead(keys){
   keys = keys.filter(k => k)

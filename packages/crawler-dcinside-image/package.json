@@ -1,6 +1,6 @@
 {
   "name": "@programming-gallery/crawler-dcinside-image",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.2-alpha.1",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
@@ -20,8 +20,7 @@
     "clean": "gts clean",
     "compile": "tsc",
     "tsc": "tsc",
-    "fix": "gts fix",
-    "prepare": "npm run compile"
+    "fix": "gts fix"
   },
   "devDependencies": {
     "@types/jest": "^26.0.7",

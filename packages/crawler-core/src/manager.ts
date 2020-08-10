@@ -43,7 +43,9 @@ export class Manager {
     const contracts: Contract[] = messages.map(message => JSON.parse(message.Body!));
     const histories: IHistory[] = await Promise.all(contracts.map(contract => this.HistoryConstructor.getOrCreate(contract.id)));
     let validations: boolean[] = contracts.map((contract, i) => histories[i].isValid(contract.trackingKey))
-    await Promise.all(contracts.map((contract, i) => this.worker.work(contract, histories[i])));
+    let errors: any[] = (await Promise.all(contracts.map((contract, i) => this.worker.work(contract, histories[i]).catch(e => e)))).filter(r => r);
+    for(let e of errors)
+      console.log(e.stack)
     const nextContracts = contracts.map(c => Object.assign(c, { trackingKey : new Date().getTime() + Math.random() }));
     const historyUpdeateResults = await Promise.all(histories.map((history, i) => history.save(nextContracts[i].trackingKey)));
     validations = validations.map((v, i) => historyUpdeateResults[i] && v);

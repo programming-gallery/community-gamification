@@ -7,7 +7,7 @@ import { DcinsideWorker } from './dcinside-worker';
  * @param NORMAL_QUEUE_URL, 
  * @param PRIORITY_QUEUE_URL,
  * @param HISTORY_TABLE_NAME,
- * @param DOCUMENT_TABLE_NAME - used by ./model.ts
+ * @param DELIVERY_STREAM_NAME - used by ./dcinside-worker.ts
  *
  * Optional enviroment variables:
  * @param AWS_CONFIG

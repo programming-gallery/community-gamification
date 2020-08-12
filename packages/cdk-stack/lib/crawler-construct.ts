@@ -62,7 +62,11 @@ export interface CrawlerProps {
   /** 
    * platform specific enviroment variable
    */
-  environment?: { [key: string]: string },
+  environment?: { [key: string]: string };
+  /**
+   * initial task role policy
+   */
+  policies?: iam.PolicyStatement[];
 }
 
 export class Crawler extends cdk.Construct {
@@ -95,6 +99,7 @@ export class Crawler extends cdk.Construct {
       rps = 10,
       retries = 10,
       environment = {},
+      policies = [],
     } = props;
     const historyTable = new dynamodb.Table(this, 'HistoryTable', {
       partitionKey: {
@@ -166,6 +171,8 @@ export class Crawler extends cdk.Construct {
     priorityQueue.grantSendMessages(taskDefinition.taskRole);
     normalQueue.grantConsumeMessages(taskDefinition.taskRole);
     normalQueue.grantSendMessages(taskDefinition.taskRole);
+    for(let policy of policies)
+      taskDefinition.addToTaskRolePolicy(policy);
     this.taskRole = taskDefinition.taskRole;
     this.priorityQueue = priorityQueue;
     this.normalQueue = normalQueue;

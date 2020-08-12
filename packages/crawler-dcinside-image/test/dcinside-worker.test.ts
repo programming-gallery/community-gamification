@@ -5,7 +5,6 @@ process.env = {
 }
 import { Contract, Manager, IWorker, IHistory, IHistoryConstructor, buildHistory } from '@programming-gallery/crawler-core';
 import { DcinsideWorker } from '../src/dcinside-worker';
-import { dataMapper, Document } from '../src/model';
 import Queue from 'sqsqs';
 import { main } from '../src';
 jest.setTimeout(600000);
@@ -22,13 +21,13 @@ describe('dcinside-worker', () => {
     await History.createTable({readCapacityUnits: 5, writeCapacityUnits: 5});
     normalQueue = await Queue.createQueue('normalQueue', awsConfig, undefined, undefined, {WaitTimeSeconds: 1});
     priorityQueue = await Queue.createQueue('priorityQueue', awsConfig, undefined, undefined, {WaitTimeSeconds: 1});
-    await dataMapper.createTable(Document, {readCapacityUnits: 10, writeCapacityUnits: 10});
+    //await dataMapper.createTable(Document, {readCapacityUnits: 10, writeCapacityUnits: 10});
   });
   afterEach(async () => {
     await History.deleteTable();
     await normalQueue.deleteQueue();
     await priorityQueue.deleteQueue();
-    await dataMapper.deleteTable(Document);
+    //await dataMapper.deleteTable(Document);
   });
   it('main', async () => {
     process.env = {
@@ -40,7 +39,7 @@ describe('dcinside-worker', () => {
     priorityQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
     normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
     await main();
-    let docs: Document[] = [];
+    /*let docs: Document[] = [];
     for await (const doc of dataMapper.scan(Document)) {
       docs.push(doc);
     }
@@ -51,6 +50,7 @@ describe('dcinside-worker', () => {
       docs.push(doc);
     }
     expect(docs.length).toBeGreaterThanOrEqual(101);
+    */
     /*
     let res = await resultQueue.receive(200);
     expect(JSON.parse(res[0].Body || "[]").length).toEqual(100);

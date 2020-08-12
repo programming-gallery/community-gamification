@@ -1,0 +1,1296 @@
+
+> @programming-gallery/cdk-stack@0.0.3-alpha.0 cdk /home/song/community-gamification/packages/cdk-stack
+> cdk "synth"
+
+Resources:
+  Vpc8378EB38:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: CgDev/Vpc
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/Resource
+  VpcPublicSubnet1Subnet5C2D37C4:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/26
+      VpcId:
+        Ref: Vpc8378EB38
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: CgDev/Vpc/PublicSubnet1
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet1/Subnet
+  VpcPublicSubnet1RouteTable6C95E38E:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: Vpc8378EB38
+      Tags:
+        - Key: Name
+          Value: CgDev/Vpc/PublicSubnet1
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet1/RouteTable
+  VpcPublicSubnet1RouteTableAssociation97140677:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: VpcPublicSubnet1RouteTable6C95E38E
+      SubnetId:
+        Ref: VpcPublicSubnet1Subnet5C2D37C4
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet1/RouteTableAssociation
+  VpcPublicSubnet1DefaultRoute3DA9E72A:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: VpcPublicSubnet1RouteTable6C95E38E
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: VpcIGWD7BA715C
+    DependsOn:
+      - VpcVPCGWBF912B6E
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet1/DefaultRoute
+  VpcPublicSubnet2Subnet691E08A3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.64/26
+      VpcId:
+        Ref: Vpc8378EB38
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: CgDev/Vpc/PublicSubnet2
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet2/Subnet
+  VpcPublicSubnet2RouteTable94F7E489:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: Vpc8378EB38
+      Tags:
+        - Key: Name
+          Value: CgDev/Vpc/PublicSubnet2
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet2/RouteTable
+  VpcPublicSubnet2RouteTableAssociationDD5762D8:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: VpcPublicSubnet2RouteTable94F7E489
+      SubnetId:
+        Ref: VpcPublicSubnet2Subnet691E08A3
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet2/RouteTableAssociation
+  VpcPublicSubnet2DefaultRoute97F91067:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: VpcPublicSubnet2RouteTable94F7E489
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: VpcIGWD7BA715C
+    DependsOn:
+      - VpcVPCGWBF912B6E
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/PublicSubnet2/DefaultRoute
+  VpcIsolatedSubnet1SubnetE48C5737:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.128/26
+      VpcId:
+        Ref: Vpc8378EB38
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Isolated
+        - Key: aws-cdk:subnet-type
+          Value: Isolated
+        - Key: Name
+          Value: CgDev/Vpc/IsolatedSubnet1
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IsolatedSubnet1/Subnet
+  VpcIsolatedSubnet1RouteTable4771E3E5:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: Vpc8378EB38
+      Tags:
+        - Key: Name
+          Value: CgDev/Vpc/IsolatedSubnet1
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IsolatedSubnet1/RouteTable
+  VpcIsolatedSubnet1RouteTableAssociationD300FCBB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: VpcIsolatedSubnet1RouteTable4771E3E5
+      SubnetId:
+        Ref: VpcIsolatedSubnet1SubnetE48C5737
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IsolatedSubnet1/RouteTableAssociation
+  VpcIsolatedSubnet2Subnet16364B91:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.192/26
+      VpcId:
+        Ref: Vpc8378EB38
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Isolated
+        - Key: aws-cdk:subnet-type
+          Value: Isolated
+        - Key: Name
+          Value: CgDev/Vpc/IsolatedSubnet2
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IsolatedSubnet2/Subnet
+  VpcIsolatedSubnet2RouteTable1D30AF7D:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: Vpc8378EB38
+      Tags:
+        - Key: Name
+          Value: CgDev/Vpc/IsolatedSubnet2
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IsolatedSubnet2/RouteTable
+  VpcIsolatedSubnet2RouteTableAssociationF7B18CCA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: VpcIsolatedSubnet2RouteTable1D30AF7D
+      SubnetId:
+        Ref: VpcIsolatedSubnet2Subnet16364B91
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IsolatedSubnet2/RouteTableAssociation
+  VpcIGWD7BA715C:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: CgDev/Vpc
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/IGW
+  VpcVPCGWBF912B6E:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: Vpc8378EB38
+      InternetGatewayId:
+        Ref: VpcIGWD7BA715C
+    Metadata:
+      aws:cdk:path: CgDev/Vpc/VPCGW
+  GlueDatabase24880C74:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId:
+        Ref: AWS::AccountId
+      DatabaseInput:
+        Name: cg
+    Metadata:
+      aws:cdk:path: CgDev/GlueDatabase/Resource
+  Bucket83908E77:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CgDev/Bucket/Resource
+  ClusterEB0386A7:
+    Type: AWS::ECS::Cluster
+    Metadata:
+      aws:cdk:path: CgDev/Cluster/Resource
+  CrawlerDcinsideCrawlerCacheTable75F30E82:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: key
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: key
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: expireAt
+        Enabled: true
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/CacheTable/Resource
+  CrawlerDcinsideCrawlerHistoryTable0267172F:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/HistoryTable/Resource
+  CrawlerDcinsideCrawlerPriorityQueue200EF5AB:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 300
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/PriorityQueue/Resource
+  CrawlerDcinsideCrawlerNormalQueueC43BD1BA:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 300
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/NormalQueue/Resource
+  CrawlerDcinsideCrawlerTaskDefTaskRole528EC048:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/TaskDef/TaskRole/Resource
+  CrawlerDcinsideCrawlerTaskDefTaskRoleDefaultPolicyA2CE2283:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetRecords
+              - dynamodb:GetShardIterator
+              - dynamodb:Query
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:BatchWriteItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CrawlerDcinsideCrawlerHistoryTable0267172F
+                  - Arn
+              - Ref: AWS::NoValue
+          - Action:
+              - sqs:ReceiveMessage
+              - sqs:ChangeMessageVisibility
+              - sqs:GetQueueUrl
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerPriorityQueue200EF5AB
+                - Arn
+          - Action:
+              - sqs:SendMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerPriorityQueue200EF5AB
+                - Arn
+          - Action:
+              - sqs:ReceiveMessage
+              - sqs:ChangeMessageVisibility
+              - sqs:GetQueueUrl
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerNormalQueueC43BD1BA
+                - Arn
+          - Action:
+              - sqs:SendMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerNormalQueueC43BD1BA
+                - Arn
+          - Action:
+              - firehose:DeleteDeliveryStream
+              - firehose:PutRecord
+              - firehose:PutRecordBatch
+              - firehose:UpdateDestination
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideDeliveryStreamC030D843
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CrawlerDcinsideCrawlerTaskDefTaskRoleDefaultPolicyA2CE2283
+      Roles:
+        - Ref: CrawlerDcinsideCrawlerTaskDefTaskRole528EC048
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/TaskDef/TaskRole/DefaultPolicy/Resource
+  CrawlerDcinsideCrawlerTaskDef363E7ED2:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Environment:
+            - Name: NORMAL_QUEUE_URL
+              Value:
+                Ref: CrawlerDcinsideCrawlerNormalQueueC43BD1BA
+            - Name: PRIORITY_QUEUE_URL
+              Value:
+                Ref: CrawlerDcinsideCrawlerPriorityQueue200EF5AB
+            - Name: CAHCE_TABLE_NAME
+              Value:
+                Ref: CrawlerDcinsideCrawlerCacheTable75F30E82
+            - Name: HISTORY_TABLE_NAME
+              Value:
+                Ref: CrawlerDcinsideCrawlerHistoryTable0267172F
+            - Name: RPS
+              Value: "10"
+            - Name: RETRIES
+              Value: "10"
+            - Name: DELIVERY_STREAM_NAME
+              Value: CgDevCrawlerDcinsideDeliveryStream
+          Essential: true
+          Image:
+            Fn::Join:
+              - ""
+              - - Ref: AWS::AccountId
+                - .dkr.ecr.
+                - Ref: AWS::Region
+                - "."
+                - Ref: AWS::URLSuffix
+                - /aws-cdk/assets:6f740029614db99d1251135c47463ed117cddd9c73eca210f97685556ac61d4f
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: CrawlerDcinsideCrawlerTaskDefContainerLogGroup5041EA39
+              awslogs-stream-prefix: Crawler
+              awslogs-region:
+                Ref: AWS::Region
+          Name: Container
+      Cpu: "256"
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - CrawlerDcinsideCrawlerTaskDefExecutionRole7066D202
+          - Arn
+      Family: CgDevCrawlerDcinsideCrawlerTaskDef16746753
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
+        Fn::GetAtt:
+          - CrawlerDcinsideCrawlerTaskDefTaskRole528EC048
+          - Arn
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/TaskDef/Resource
+  CrawlerDcinsideCrawlerTaskDefContainerLogGroup5041EA39:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/TaskDef/Container/LogGroup/Resource
+  CrawlerDcinsideCrawlerTaskDefExecutionRole7066D202:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/TaskDef/ExecutionRole/Resource
+  CrawlerDcinsideCrawlerTaskDefExecutionRoleDefaultPolicy03E34DDE:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - ":ecr:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - :repository/aws-cdk/assets
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerTaskDefContainerLogGroup5041EA39
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CrawlerDcinsideCrawlerTaskDefExecutionRoleDefaultPolicy03E34DDE
+      Roles:
+        - Ref: CrawlerDcinsideCrawlerTaskDefExecutionRole7066D202
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/TaskDef/ExecutionRole/DefaultPolicy/Resource
+  CrawlerDcinsideCrawlerFargateService3FC6C7FB:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: ClusterEB0386A7
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 5
+      EnableECSManagedTags: false
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - CrawlerDcinsideCrawlerFargateServiceSecurityGroup0F214C57
+                - GroupId
+          Subnets:
+            - Ref: VpcPublicSubnet1Subnet5C2D37C4
+            - Ref: VpcPublicSubnet2Subnet691E08A3
+      TaskDefinition:
+        Ref: CrawlerDcinsideCrawlerTaskDef363E7ED2
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/FargateService/Service
+  CrawlerDcinsideCrawlerFargateServiceSecurityGroup0F214C57:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CgDev/CrawlerDcinside/Crawler/FargateService/SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: Vpc8378EB38
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Crawler/FargateService/SecurityGroup/Resource
+  CrawlerDcinsideActiveGalleryCrawlerServiceRole6C26DB57:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/ActiveGalleryCrawler/ServiceRole/Resource
+  CrawlerDcinsideActiveGalleryCrawlerServiceRoleDefaultPolicyF740B255:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sqs:SendMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerPriorityQueue200EF5AB
+                - Arn
+          - Action:
+              - sqs:SendMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideCrawlerNormalQueueC43BD1BA
+                - Arn
+          - Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetRecords
+              - dynamodb:GetShardIterator
+              - dynamodb:Query
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:BatchWriteItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CrawlerDcinsideCrawlerCacheTable75F30E82
+                  - Arn
+              - Ref: AWS::NoValue
+        Version: "2012-10-17"
+      PolicyName: CrawlerDcinsideActiveGalleryCrawlerServiceRoleDefaultPolicyF740B255
+      Roles:
+        - Ref: CrawlerDcinsideActiveGalleryCrawlerServiceRole6C26DB57
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/ActiveGalleryCrawler/ServiceRole/DefaultPolicy/Resource
+  CrawlerDcinsideActiveGalleryCrawler7A1D9CA9:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8fS3BucketA8411EB5
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8fS3VersionKeyAA602FFD
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8fS3VersionKeyAA602FFD
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CrawlerDcinsideActiveGalleryCrawlerServiceRole6C26DB57
+          - Arn
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          CONTRACT_QUEUE_URL:
+            Ref: CrawlerDcinsideCrawlerPriorityQueue200EF5AB
+          CACHE_TABLE_NAME:
+            Ref: CrawlerDcinsideCrawlerCacheTable75F30E82
+      MemorySize: 255
+      Timeout: 300
+    DependsOn:
+      - CrawlerDcinsideActiveGalleryCrawlerServiceRoleDefaultPolicyF740B255
+      - CrawlerDcinsideActiveGalleryCrawlerServiceRole6C26DB57
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/ActiveGalleryCrawler/Resource
+      aws:asset:path: asset.33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8f
+      aws:asset:property: Code
+  CrawlerDcinsideActiveGalleryCrawlerAllowEventRuleCgDevCrawlerDcinsideRule0D8771F21E770D94:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CrawlerDcinsideActiveGalleryCrawler7A1D9CA9
+          - Arn
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - CrawlerDcinsideRule3869EF4A
+          - Arn
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/ActiveGalleryCrawler/AllowEventRuleCgDevCrawlerDcinsideRule0D8771F2
+  CrawlerDcinsideRule3869EF4A:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(5 minutes)
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - CrawlerDcinsideActiveGalleryCrawler7A1D9CA9
+              - Arn
+          Id: Target0
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinside/Rule/Resource
+  CrawlerDcinsideDeliveryStreamBucketA7BA2564:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/Bucket/Resource
+  CrawlerDcinsideDeliveryStreamBucketNotificationsBB8F6D8C:
+    Type: Custom::S3BucketNotifications
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691
+          - Arn
+      BucketName:
+        Ref: CrawlerDcinsideDeliveryStreamBucketA7BA2564
+      NotificationConfiguration:
+        LambdaFunctionConfigurations:
+          - Events:
+              - s3:ObjectCreated:*
+            Filter:
+              Key:
+                FilterRules:
+                  - Name: prefix
+                    Value: datalake/
+            LambdaFunctionArn:
+              Fn::GetAtt:
+                - CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdator38F12593
+                - Arn
+    DependsOn:
+      - CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorAllowBucketNotificationsFromCgDevCrawlerDcinsideDeliveryStreamBucket67C102CBBF4162A0
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/Bucket/Notifications/Resource
+  CrawlerDcinsideDeliveryStreamWorkgroupEE62F4CF:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: CgDevDDL
+      RecursiveDeleteOption: true
+      State: ENABLED
+      WorkGroupConfiguration:
+        EnforceWorkGroupConfiguration: false
+        PublishCloudWatchMetricsEnabled: true
+        ResultConfiguration:
+          OutputLocation:
+            Fn::Join:
+              - ""
+              - - s3://
+                - Ref: CrawlerDcinsideDeliveryStreamBucketA7BA2564
+                - /athena-ddl-query-result/
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/Workgroup
+  CrawlerDcinsideDeliveryStreamGlueDatabaseCC462F9A:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId:
+        Ref: AWS::AccountId
+      DatabaseInput:
+        Name: CgDev
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/GlueDatabase/Resource
+  CrawlerDcinsideDeliveryStreamDataIngestionTable007D4535:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId:
+        Ref: AWS::AccountId
+      DatabaseName:
+        Ref: CrawlerDcinsideDeliveryStreamGlueDatabaseCC462F9A
+      TableInput:
+        Description: CrawlerDcinside generated by CDK
+        Name: CrawlerDcinside
+        Parameters:
+          has_encrypted_data: false
+        PartitionKeys:
+          - Name: dateWithHours
+            Type: string
+        StorageDescriptor:
+          Columns:
+            - Name: gallery
+              Type: struct<id:string,isMiner:boolean>
+            - Name: id
+              Type: bigint
+            - Name: title
+              Type: string
+            - Name: commentCount
+              Type: int
+            - Name: likeCount
+              Type: int
+            - Name: hasImage
+              Type: boolean
+            - Name: hasVideo
+              Type: boolean
+            - Name: createdAt
+              Type: timestamp
+            - Name: user
+              Type: struct<nickname:string,ip:string,id:string>
+          Compressed: true
+          InputFormat: org.apache.hadoop.hive.ql.io.orc.OrcInputFormat
+          Location:
+            Fn::Join:
+              - ""
+              - - s3://
+                - Ref: CrawlerDcinsideDeliveryStreamBucketA7BA2564
+                - /datalake/CrawlerDcinside/
+          OutputFormat: org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat
+          SerdeInfo:
+            SerializationLibrary: org.apache.hadoop.hive.ql.io.orc.OrcSerde
+          StoredAsSubDirectories: true
+        TableType: EXTERNAL_TABLE
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/DataIngestion/Table
+  CrawlerDcinsideDeliveryStreamDataIngestionRole295D7F79:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/DataIngestionRole/Resource
+  CrawlerDcinsideDeliveryStreamDataIngestionRoleDefaultPolicyB7D76F1F:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CrawlerDcinsideDeliveryStreamBucketA7BA2564
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CrawlerDcinsideDeliveryStreamBucketA7BA2564
+                        - Arn
+                    - /*
+          - Action: glue:GetTableVersions
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CrawlerDcinsideDeliveryStreamCrawlerDcinsideDeliveryStreamDeliveryStreamLogGroup9288F37E
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CrawlerDcinsideDeliveryStreamDataIngestionRoleDefaultPolicyB7D76F1F
+      Roles:
+        - Ref: CrawlerDcinsideDeliveryStreamDataIngestionRole295D7F79
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/DataIngestionRole/DefaultPolicy/Resource
+  CrawlerDcinsideDeliveryStreamCrawlerDcinsideDeliveryStreamDeliveryStreamLogGroup9288F37E:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/CrawlerDcinsideDeliveryStreamDeliveryStreamLogGroup/Resource
+  CrawlerDcinsideDeliveryStreamCrawlerDcinsideDeliveryStreamDeliveryStreamLogStreamB2983132:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName:
+        Ref: CrawlerDcinsideDeliveryStreamCrawlerDcinsideDeliveryStreamDeliveryStreamLogGroup9288F37E
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/CrawlerDcinsideDeliveryStreamDeliveryStreamLogStream/Resource
+  CrawlerDcinsideDeliveryStreamC030D843:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: CgDevCrawlerDcinsideDeliveryStream
+      DeliveryStreamType: DirectPut
+      ExtendedS3DestinationConfiguration:
+        BucketARN:
+          Fn::GetAtt:
+            - CrawlerDcinsideDeliveryStreamBucketA7BA2564
+            - Arn
+        BufferingHints:
+          IntervalInSeconds: 600
+          SizeInMBs: 128
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName:
+            Ref: CrawlerDcinsideDeliveryStreamCrawlerDcinsideDeliveryStreamDeliveryStreamLogGroup9288F37E
+          LogStreamName:
+            Ref: CrawlerDcinsideDeliveryStreamCrawlerDcinsideDeliveryStreamDeliveryStreamLogStreamB2983132
+        CompressionFormat: UNCOMPRESSED
+        DataFormatConversionConfiguration:
+          Enabled: true
+          InputFormatConfiguration:
+            Deserializer:
+              OpenXJsonSerDe: {}
+          OutputFormatConfiguration:
+            Serializer:
+              OrcSerDe: {}
+          SchemaConfiguration:
+            CatalogId:
+              Ref: AWS::AccountId
+            DatabaseName:
+              Ref: CrawlerDcinsideDeliveryStreamGlueDatabaseCC462F9A
+            Region:
+              Ref: AWS::Region
+            RoleARN:
+              Fn::GetAtt:
+                - CrawlerDcinsideDeliveryStreamDataIngestionRole295D7F79
+                - Arn
+            TableName:
+              Ref: CrawlerDcinsideDeliveryStreamDataIngestionTable007D4535
+            VersionId: LATEST
+        EncryptionConfiguration:
+          NoEncryptionConfig: NoEncryption
+        ErrorOutputPrefix: datalake/error/!{firehose:error-output-type}/CrawlerDcinside/dateWithHours=!{timestamp:yyyy-MM-dd-HH}/
+        Prefix: datalake/CrawlerDcinside/dateWithHours=!{timestamp:yyyy-MM-dd-HH}/
+        RoleARN:
+          Fn::GetAtt:
+            - CrawlerDcinsideDeliveryStreamDataIngestionRole295D7F79
+            - Arn
+    DependsOn:
+      - CrawlerDcinsideDeliveryStreamDataIngestionRoleDefaultPolicyB7D76F1F
+      - CrawlerDcinsideDeliveryStreamDataIngestionRole295D7F79
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/DeliveryStream
+  CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDD8508DA:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/GlueTablePartitionUpdator/ServiceRole/Resource
+  CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDefaultPolicy19131B9F:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: athena:*
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:athena:"
+                  - Fn::GetAtt:
+                      - CrawlerDcinsideDeliveryStreamWorkgroupEE62F4CF
+                      - Region
+                  - ":"
+                  - Fn::GetAtt:
+                      - CrawlerDcinsideDeliveryStreamWorkgroupEE62F4CF
+                      - Account
+                  - :workgroup/CgDevDDL
+          - Action: glue:*
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetBucketLocation
+              - s3:ListBucket
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CrawlerDcinsideDeliveryStreamBucketA7BA2564
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CrawlerDcinsideDeliveryStreamBucketA7BA2564
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDefaultPolicy19131B9F
+      Roles:
+        - Ref: CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDD8508DA
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/GlueTablePartitionUpdator/ServiceRole/DefaultPolicy/Resource
+  CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdator38F12593:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814cS3Bucket8A745D22
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814cS3VersionKeyC15C82B4
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814cS3VersionKeyC15C82B4
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDD8508DA
+          - Arn
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          PARTITION_KEY: date_with_hours
+          TABLE:
+            Ref: CrawlerDcinsideDeliveryStreamDataIngestionTable007D4535
+          DATABASE:
+            Ref: CrawlerDcinsideDeliveryStreamGlueDatabaseCC462F9A
+          WORKGROUP: CgDevDDL
+      Timeout: 600
+    DependsOn:
+      - CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDefaultPolicy19131B9F
+      - CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorServiceRoleDD8508DA
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/GlueTablePartitionUpdator/Resource
+      aws:asset:path: asset.4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814c
+      aws:asset:property: Code
+  CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorLogRetentionAEA27522:
+    Type: Custom::LogRetention
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A
+          - Arn
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - /aws/lambda/
+            - Ref: CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdator38F12593
+      RetentionInDays: 7
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/GlueTablePartitionUpdator/LogRetention/Resource
+  CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdatorAllowBucketNotificationsFromCgDevCrawlerDcinsideDeliveryStreamBucket67C102CBBF4162A0:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CrawlerDcinsideDeliveryStreamGlueTablePartitionUpdator38F12593
+          - Arn
+      Principal: s3.amazonaws.com
+      SourceAccount:
+        Ref: AWS::AccountId
+      SourceArn:
+        Fn::GetAtt:
+          - CrawlerDcinsideDeliveryStreamBucketA7BA2564
+          - Arn
+    Metadata:
+      aws:cdk:path: CgDev/CrawlerDcinsideDeliveryStream/GlueTablePartitionUpdator/AllowBucketNotificationsFromCgDevCrawlerDcinsideDeliveryStreamBucket67C102CB
+  LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CgDev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource
+  LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:PutRetentionPolicy
+              - logs:DeleteRetentionPolicy
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB
+      Roles:
+        - Ref: LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB
+    Metadata:
+      aws:cdk:path: CgDev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource
+  LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9S3Bucket8795CE3D
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9S3VersionKeyFC482B2A
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9S3VersionKeyFC482B2A
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB
+          - Arn
+      Runtime: nodejs10.x
+    DependsOn:
+      - LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB
+      - LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB
+    Metadata:
+      aws:cdk:path: CgDev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource
+      aws:asset:path: asset.27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9
+      aws:asset:property: Code
+  BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CgDev/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource
+  BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: s3:PutBucketNotification
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36
+      Roles:
+        - Ref: BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC
+    Metadata:
+      aws:cdk:path: CgDev/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource
+  BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: AWS CloudFormation handler for "Custom::S3BucketNotifications" resources (@aws-cdk/aws-s3)
+      Code:
+        ZipFile: >-
+          exports.handler = (event, context) => {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports, import/no-extraneous-dependencies
+              const s3 = new (require('aws-sdk').S3)();
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const https = require('https');
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const url = require('url');
+              log(JSON.stringify(event, undefined, 2));
+              const props = event.ResourceProperties;
+              if (event.RequestType === 'Delete') {
+                  props.NotificationConfiguration = {}; // this is how you clean out notifications
+              }
+              const req = {
+                  Bucket: props.BucketName,
+                  NotificationConfiguration: props.NotificationConfiguration,
+              };
+              return s3.putBucketNotificationConfiguration(req, (err, data) => {
+                  log({ err, data });
+                  if (err) {
+                      return submitResponse('FAILED', err.message + `\nMore information in CloudWatch Log Stream: ${context.logStreamName}`);
+                  }
+                  else {
+                      return submitResponse('SUCCESS');
+                  }
+              });
+              function log(obj) {
+                  console.error(event.RequestId, event.StackId, event.LogicalResourceId, obj);
+              }
+              // eslint-disable-next-line max-len
+              // adapted from https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-cfnresponsemodule
+              // to allow sending an error messge as a reason.
+              function submitResponse(responseStatus, reason) {
+                  const responseBody = JSON.stringify({
+                      Status: responseStatus,
+                      Reason: reason || 'See the details in CloudWatch Log Stream: ' + context.logStreamName,
+                      PhysicalResourceId: event.PhysicalResourceId || event.LogicalResourceId,
+                      StackId: event.StackId,
+                      RequestId: event.RequestId,
+                      LogicalResourceId: event.LogicalResourceId,
+                      NoEcho: false,
+                  });
+                  log({ responseBody });
+                  const parsedUrl = url.parse(event.ResponseURL);
+                  const options = {
+                      hostname: parsedUrl.hostname,
+                      port: 443,
+                      path: parsedUrl.path,
+                      method: 'PUT',
+                      headers: {
+                          'content-type': '',
+                          'content-length': responseBody.length,
+                      },
+                  };
+                  const request = https.request(options, (r) => {
+                      log({ statusCode: r.statusCode, statusMessage: r.statusMessage });
+                      context.done();
+                  });
+                  request.on('error', (error) => {
+                      log({ sendError: error });
+                      context.done();
+                  });
+                  request.write(responseBody);
+                  request.end();
+              }
+          };
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC
+          - Arn
+      Runtime: nodejs10.x
+      Timeout: 300
+    DependsOn:
+      - BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36
+      - BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC
+    Metadata:
+      aws:cdk:path: CgDev/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.52.0,@aws-cdk/assets=1.52.0,@aws-cdk/aws-applicationautoscaling=1.52.0,@aws-cdk/aws-athena=1.52.0,@aws-cdk/aws-autoscaling=1.52.0,@aws-cdk/aws-autoscaling-common=1.52.0,@aws-cdk/aws-autoscaling-hooktargets=1.52.0,@aws-cdk/aws-cloudwatch=1.52.0,@aws-cdk/aws-codeguruprofiler=1.52.0,@aws-cdk/aws-dynamodb=1.52.0,@aws-cdk/aws-ec2=1.52.0,@aws-cdk/aws-ecr=1.52.0,@aws-cdk/aws-ecr-assets=1.52.0,@aws-cdk/aws-ecs=1.52.0,@aws-cdk/aws-elasticloadbalancingv2=1.52.0,@aws-cdk/aws-events=1.52.0,@aws-cdk/aws-events-targets=1.52.0,@aws-cdk/aws-glue=1.52.0,@aws-cdk/aws-iam=1.52.0,@aws-cdk/aws-kinesisfirehose=1.52.0,@aws-cdk/aws-kms=1.52.0,@aws-cdk/aws-lambda=1.52.0,@aws-cdk/aws-logs=1.52.0,@aws-cdk/aws-s3=1.52.0,@aws-cdk/aws-s3-assets=1.52.0,@aws-cdk/aws-s3-notifications=1.52.0,@aws-cdk/aws-servicediscovery=1.52.0,@aws-cdk/aws-sns=1.52.0,@aws-cdk/aws-sns-subscriptions=1.52.0,@aws-cdk/aws-sqs=1.52.0,@aws-cdk/aws-ssm=1.52.0,@aws-cdk/cloud-assembly-schema=1.52.0,@aws-cdk/core=1.52.0,@aws-cdk/custom-resources=1.52.0,@aws-cdk/cx-api=1.52.0,@aws-cdk/region-info=1.52.0,jsii-runtime=node.js/v12.18.3
+    Condition: CDKMetadataAvailable
+Parameters:
+  AssetParameters4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814cS3Bucket8A745D22:
+    Type: String
+    Description: S3 bucket for asset "4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814c"
+  AssetParameters4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814cS3VersionKeyC15C82B4:
+    Type: String
+    Description: S3 key for asset version "4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814c"
+  AssetParameters4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814cArtifactHash9A911214:
+    Type: String
+    Description: Artifact hash for asset "4ca814241bf6510f6f511ece8a7cbd5ef52761d9fa546242cf88f698f3d3814c"
+  AssetParameters27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9S3Bucket8795CE3D:
+    Type: String
+    Description: S3 bucket for asset "27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9"
+  AssetParameters27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9S3VersionKeyFC482B2A:
+    Type: String
+    Description: S3 key for asset version "27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9"
+  AssetParameters27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9ArtifactHash8DB7EB35:
+    Type: String
+    Description: Artifact hash for asset "27b58c1b3f137723c1cdbb881058a4b21230873b55318044de2a913e607a49f9"
+  AssetParameters33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8fS3BucketA8411EB5:
+    Type: String
+    Description: S3 bucket for asset "33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8f"
+  AssetParameters33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8fS3VersionKeyAA602FFD:
+    Type: String
+    Description: S3 key for asset version "33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8f"
+  AssetParameters33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8fArtifactHash80DB884B:
+    Type: String
+    Description: Artifact hash for asset "33ba045dd825df0138ca07a3610d484e67acf5d68b94198f802a3d8356192d8f"
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+

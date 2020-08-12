@@ -18,7 +18,7 @@ describe('history', () => {
   });
   it('history update', async () => {
     let history = await History.getOrCreate('1');
-    history.update(3600, 0, 3600*1000, '1');
+    history.update(3600, new Date().getTime() - 3600*1000, new Date().getTime(), '1');
     expect(history.data).toEqual({
       id: '1',
       postingFrequencyEA: 1,

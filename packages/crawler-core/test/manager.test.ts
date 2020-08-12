@@ -5,17 +5,17 @@ import { Contract, Manager, IWorker, IHistory, IHistoryConstructor, buildHistory
 
 let priorityResult = [{
   id: 2,
-  createdAt: 3600*1000,
+  createdAt: new Date().getTime() ,
 }, {
   id: 1,
-  createdAt: 0,
+  createdAt: new Date().getTime() - 2400*1000,
 }];
 let normalResult = [{
   id: 4,
-  createdAt: 7200*1000,
+  createdAt: new Date().getTime(), 
 }, {
   id: 3,
-  createdAt: 0,
+  createdAt: new Date().getTime() - 7200*1000,
 }];
 class MockedWorker implements IWorker {
   async work(contract: Contract, history: IHistory): Promise<any> {
@@ -25,16 +25,16 @@ class MockedWorker implements IWorker {
         res.length, 
         res[1].createdAt,
         res[0].createdAt,
-        "" + res[0].id);
-      return res;
+        "" + res[0].id, 1.0);
+      return;
     } else if(contract.id === "2"){
       let res = normalResult;
       history.update(
         res.length, 
         res[1].createdAt,
         res[0].createdAt,
-        "" + res[0].id);
-      return res;
+        "" + res[0].id, 1.0);
+      return;
     }
   }
 }

@@ -39,5 +39,5 @@
     "aws-sdk": "^2.720.0",
     "sqsqs": "^0.2.8"
   },
-  "gitHead": "702bad6c48f9fc4b87a8ffe992a8e710abc0600b"
+  "gitHead": "ce5e1f34bc1604a99709f3b1765d1402e8ca277b"
 }

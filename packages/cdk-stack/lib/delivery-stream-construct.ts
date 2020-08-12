@@ -140,9 +140,10 @@ export class DeliveryStream extends cdk.Construct {
 					},
 					outputFormatConfiguration: {
 						serializer: {
-							orcSerDe: {
+							/*orcSerDe: {
 								//compression: "SNAPPY",
-							}
+							}*/
+              parquetSerDe: {},
 						},
 					},
 					schemaConfiguration: {

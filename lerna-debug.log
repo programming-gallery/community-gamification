@@ -1,8 +1,6 @@
-68 warn complete Waiting for 3 child processes to exit. CTRL-C to exit immediately.
-69 error Error: Command failed: git tag @programming-gallery/cdk-stack@0.0.2-alpha.0 -m @programming-gallery/cdk-stack@0.0.2-alpha.0
-69 error fatal: tag '@programming-gallery/cdk-stack@0.0.2-alpha.0' already exists
-69 error
-69 error     at makeError (/home/song/community-gamification/node_modules/execa/index.js:174:9)
-69 error     at /home/song/community-gamification/node_modules/execa/index.js:278:16
-69 error     at processTicksAndRejections (internal/process/task_queues.js:97:5)
-69 error     at async Promise.all (index 1)
+60 error Error: Command failed: git push --follow-tags --no-verify --atomic origin dcdc.gg
+60 error remote: Invalid username or password.
+60 error fatal: Authentication failed for 'https://github.com/programming-gallery/community-gamification/'
+60 error
+60 error     at makeError (/home/song/community-gamification/node_modules/execa/index.js:174:9)
+60 error     at /home/song/community-gamification/node_modules/execa/index.js:278:16

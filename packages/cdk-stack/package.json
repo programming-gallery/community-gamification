@@ -44,5 +44,5 @@
     "@aws-cdk/core": "1.52.0",
     "source-map-support": "^0.5.16"
   },
-  "gitHead": "e6fd3b0d01a0968df530499de7fc7a327ae88b44"
+  "gitHead": "ce5e1f34bc1604a99709f3b1765d1402e8ca277b"
 }

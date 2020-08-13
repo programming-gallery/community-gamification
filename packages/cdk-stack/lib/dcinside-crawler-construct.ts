@@ -18,8 +18,6 @@ import { DeliveryStream } from "./delivery-stream-construct";
 export interface Props {
   vpc: ec2.Vpc;
   cluster: ecs.Cluster;
-  glueDatabase: glue.Database;
-  bucket: s3.Bucket;
   desiredTaskCount?: number;
 }
 
@@ -28,7 +26,7 @@ export class DcinsideCrawler extends cdk.Construct {
 
   constructor(scope: cdk.Stack, id: string, props: Props) {
     super(scope, id);
-    const { vpc, cluster, glueDatabase, bucket, desiredTaskCount = 5 } = props;
+    const { vpc, cluster, desiredTaskCount = 5 } = props;
     /*
     const documentTable = new dynamodb.Table(this, 'DocumentTable', {
       partitionKey: {
@@ -49,8 +47,6 @@ export class DcinsideCrawler extends cdk.Construct {
       //vpc,
       //cluster,
       tableName: 'dcinside_document',
-      //database: glueDatabase,
-      //bucket,
       columns: [{
         name: 'galleryId',
         type: glue.Schema.STRING,

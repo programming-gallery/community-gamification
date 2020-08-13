@@ -26,18 +26,13 @@ export class CgStack extends cdk.Stack {
         subnetType: ec2.SubnetType.ISOLATED,
       }],
     });
-    const glueDatabase = new glue.Database(this, 'GlueDatabase', {
-      databaseName: 'cg',
-    });
-    const bucket = new s3.Bucket(this, 'Bucket', {});
-
     const cluster = new ecs.Cluster(this, 'Cluster', { vpc });
 
     const crawlerDcinside = new DcinsideCrawler(this, 'CrawlerDcinside', { 
       cluster,
       vpc,
-      glueDatabase,
-      bucket,
+      //glueDatabase,
+      //bucket,
       desiredTaskCount: 5,
     })
   }

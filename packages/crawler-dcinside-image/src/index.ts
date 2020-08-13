@@ -34,6 +34,7 @@ export async function main(){
   const worker = new DcinsideWorker(isNaN(rps)? undefined: rps, isNaN(retries)? undefined: retries);
   const manager = new Manager(PRIORITY_QUEUE_URL, NORMAL_QUEUE_URL, HISTORY_TABLE_NAME, worker, { priorityWorkCount: 100, normalWorkCount: 1, awsConfig: awsConfig });
   await manager.manage();
+  process.exit(1);
 }
 
 if (typeof module !== 'undefined' && !module.parent) {

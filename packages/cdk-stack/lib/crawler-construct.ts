@@ -111,9 +111,11 @@ export class Crawler extends cdk.Construct {
     });
     const priorityQueue = new sqs.Queue(this, 'PriorityQueue', {
       visibilityTimeout,
+      deliveryDelay: cdk.Duration.seconds(600),
     });
     const normalQueue = new sqs.Queue(this, 'NormalQueue', {
       visibilityTimeout,
+      deliveryDelay: cdk.Duration.seconds(600),
     });
     const taskDefinition = new ecs.FargateTaskDefinition(this, "TaskDef", {
       memoryLimitMiB,

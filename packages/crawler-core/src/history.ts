@@ -27,10 +27,15 @@ export interface IDataModel {
    * If a task has the same tracking key in the table, we assume the task is valid.
    */
   trackingKey?: number;
+  /**
+   * 
+   */
+  customData?: string;
 };
 
 export interface IHistory {
   data: IDataModel;
+  customData(): string | undefined; 
   isPriority(): boolean; 
   isValid(trackingKey: number): boolean;
   /**
@@ -64,6 +69,8 @@ export function buildHistory (tableName: string, awsConfig: any, _weight: number
     public postingFrequencyEA?: number;
     @attribute()
     public trackingKey?: number;
+    @attribute()
+    public customData?: string;
   }
   let dataMapper = new DataMapper({ client: new DynamoDB(awsConfig) });
   class History implements IHistory {
@@ -98,7 +105,10 @@ export function buildHistory (tableName: string, awsConfig: any, _weight: number
     isValid(trackingKey: number): boolean { 
       return this.data.trackingKey === undefined || this.data.trackingKey === trackingKey;
     }
-    update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string, weight?: number) {
+    customData(): string | undefined {
+      return this.data.customData;
+    }
+    update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string, weight?: number, customData?: string) {
       if(weight === undefined)
         weight = _weight;
       let history = this.data;
@@ -106,6 +116,7 @@ export function buildHistory (tableName: string, awsConfig: any, _weight: number
       history.postingFrequencyEA = history.postingFrequencyEA !== undefined? history.postingFrequencyEA * (1 - weight) + frequency * weight : frequency;
       history.lastPostedTimestamp = lastPostedTimestamp;
       history.lastPostedDocumentId = lastPostedDocumentId || history.lastPostedDocumentId;
+      history.customData = customData;
     }
     async save(trackingKey: number): Promise<boolean> {
       let history = this.data;

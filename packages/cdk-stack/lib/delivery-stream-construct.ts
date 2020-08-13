@@ -88,7 +88,7 @@ export class DeliveryStream extends cdk.Construct {
         type: glue.Schema.STRING,
       }],
       columns,
-      dataFormat: glue.DataFormat.ORC,
+      dataFormat: glue.DataFormat.PARQUET,
     });
     //glueTable.node.defaultChild.addPropertyOverride('TableInput.StorageDescriptor.Columns', mergedColumns.getAtt("StorageDescriptor.Columns"));
     //glueTable.node.defaultChild.tableInput.storageDescriptor.columns = mergedColumns.getAtt("Columns");
@@ -170,7 +170,7 @@ export class DeliveryStream extends cdk.Construct {
 			logRetention: logs.RetentionDays.ONE_WEEK,
 			timeout: cdk.Duration.seconds(600),
 			environment: {
-				PARTITION_KEY: 'date_with_hours',
+				PARTITION_KEY: 'dateWithHours',
 				TABLE: glueTable.tableName,
 				DATABASE: database.databaseName,
 				WORKGROUP: workgroup.name,

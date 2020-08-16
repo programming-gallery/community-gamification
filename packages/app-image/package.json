@@ -1,6 +1,11 @@
 {
-  "name": "",
+  "name": "@programming-gallery/app-image",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
+    "directory": "packages/app-image"
+  },
   "description": "",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -30,5 +35,6 @@
     "dynamoose": "^2.3.0",
     "express": "^4.17.1",
     "express-async-router": "^0.1.15"
-  }
+  },
+  "gitHead": "7d5a7641f6cd06a9c3f71aeabeec0d70e84ecf55"
 }

@@ -156,7 +156,8 @@ def getGalleryMap():
     cluster = hdbscan.HDBSCAN(cluster_selection_method='leaf', prediction_data=True, cluster_selection_epsilon=0.01)
     clusterer = cluster.fit(pos2)
     soft_cluster = hdbscan.all_points_membership_vectors(clusterer)
-    soft_cluster = [int(np.argmax(x)) for x in soft_cluster]
+    soft_cluster_label = [int(np.argmax(x)) for x in soft_cluster]
+    soft_cluster_prob = [int(np.max(x)) for x in soft_cluster]
 
     area = sum(gallery_user_cardinalities[i])*3
     radiuses = [(car/area)**0.5 for car in gallery_user_cardinalities]
@@ -170,9 +171,9 @@ def getGalleryMap():
             'commonUserCount': x[1]
             } for x in sorted(relative_galleries[id], key=lambda x: -x[1])[:10]],
         #'coordinates': [coordinate[ci].tolist() for ci in index_to_scaled_coordinate_index[i]],
-        'node': {'x': float(pos[i][0]), 'y': float(pos[i][1]), 'r': radiuses[i] },
-        'cluster': int(cluster.labels_[i]),
-        'softcluster': soft_cluster[i],
+        'node': { 'x': float(pos[i][0]), 'y': float(pos[i][1]), 'r': radiuses[i], 'cluster': soft_cluster_label[i], 'clusterProb': soft_cluster_prob[i], },
+        #'cluster': int(cluster.labels_[i]),
+        #'softcluster': soft_cluster[i],
         } for i, id in enumerate(gallery_ids)]
     return galleries
 

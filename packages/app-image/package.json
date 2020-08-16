@@ -1,6 +1,6 @@
 {
   "name": "",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -21,9 +21,9 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/node": "^13.11.1",
     "gts": "^2.0.2",
-    "typescript": "^3.8.3",
-    "@types/node": "^13.11.1"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "@types/express": "^4.17.7",

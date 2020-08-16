@@ -41,9 +41,8 @@ export async function main(){
     await manager.manage();
   }catch(e){
     console.log(e);
-  }finally {
-    process.exit(1);
   }
+  process.exit(1);
 }
 
 if (typeof module !== 'undefined' && !module.parent) {

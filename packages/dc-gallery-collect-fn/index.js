@@ -6,7 +6,7 @@
  * Optional enviroment variables:
  * @param AWS_CONFIG,
  */
-const Crawler = require('dcinside-crawler').default;
+const { Crawler } = require('dcinside-crawler');
 const crawler = new Crawler();
 function chunk(arr, chunk_size) {
   var R = [];
@@ -55,11 +55,15 @@ async function cacheWrite(items){
 
 exports.handler = async (event, context) => {
   //await crawler.documentHeaders({ gallery: { id: 'programming', isMiner: false }});
+  console.log("gallery fetch..");
   let galleries = await crawler.activeGalleryIndexes();
+  console.log("gallery cache fetch..");
   let galleryCaches = (await cacheRead(galleries.map(gall => `dcinsideActiveGalleryCollection$#${gall.id}`)))
     .reduce((o, i) => (o[i.id] = Object.assign(i, {cacheHit: true}), o), {});
   const newGalleries = galleries.filter(gall => galleryCaches[""+gall.id] == null);
+  console.log("gallery cache write..");
   await cacheWrite(newGalleries.reduce((o, gall) => (o[`dcinsideActiveGalleryCollection$#${gall.id}`] = gall, o), {}));
+  console.log("send result..");
   await contactQueue.send(newGalleries.map(gall => JSON.stringify({
     id: gall.id + (gall.isMiner? '#isMiner' : ''),
     trackingKey: new Date().getTime() + Math.random(),

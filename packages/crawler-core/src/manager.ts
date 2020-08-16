@@ -73,10 +73,10 @@ export class Manager {
   }*/
   async manage() {
     for(let i=0; i<this.priorityWorkCount; ++i){
-      const [message] = await this.priorityQueue.receive(1);
-      const contract = JSON.parse(message.Body!);
-      const history = await this.HistoryConstructor.getOrCreate(contract.id);
       try {
+        const [message] = await this.priorityQueue.receive(1);
+        const contract = JSON.parse(message.Body!);
+        const history = await this.HistoryConstructor.getOrCreate(contract.id);
         await this.worker.work(contract, history);
         const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
         if(history.isPriority())
@@ -90,10 +90,10 @@ export class Manager {
       }
     }
     for(let i=0; i<this.normalWorkCount; ++i) {
-      const [message] = await this.normalQueue.receive(1);
-      const contract = JSON.parse(message.Body!);
-      const history = await this.HistoryConstructor.getOrCreate(contract.id);
       try {
+        const [message] = await this.normalQueue.receive(1);
+        const contract = JSON.parse(message.Body!);
+        const history = await this.HistoryConstructor.getOrCreate(contract.id);
         await this.worker.work(contract, history);
         const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
         if(history.isPriority())

@@ -113,6 +113,9 @@ export class DcinsideCrawler extends cdk.Construct {
       environment: {
         //'DOCUMENT_TABLE_NAME': documentTable.tableName,
         'DELIVERY_STREAM_NAME': deliveryStream.deliveryStream.deliveryStreamName!,
+        'RPS': '30',
+        'PRIORITY_WORK_COUNT': '20',
+        'NORMAL_WORK_COUNT': '1',
       },
       /*
       policies: [

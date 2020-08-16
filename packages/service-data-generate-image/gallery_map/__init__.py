@@ -8,7 +8,7 @@ import gallery_index
 import mobile_ip
 import datastore
 from gallery_map.models import umap, grid
-#import hdbscan
+import hdbscan
 
 KEY = 'gallery-map'
 
@@ -42,9 +42,9 @@ def getGallerySimilaritiesWithUserCount(duration_in_days = 30):
       c2.galleryId galleryId2, 
       -- cardinality(array_intersect(c1.users, c2.users))*1.0 similarity,
         (1.0*cardinality(array_intersect(c1.staticUsers, c2.staticUsers))
-        + 0.2*cardinality(array_intersect(c1.dynamicUsers, c2.dynamicUsers))) / 
+        + 1.0*cardinality(array_intersect(c1.dynamicUsers, c2.dynamicUsers))) / 
           ((cardinality(c1.staticUsers) + cardinality(c2.staticUsers) - 1.0*cardinality(array_intersect(c1.staticUsers, c2.staticUsers)))
-          + (cardinality(c1.dynamicUsers)*0.2 + cardinality(c2.dynamicUsers)*0.2 - cardinality(array_intersect(c1.dynamicUsers, c2.dynamicUsers))*0.2))
+          + (cardinality(c1.dynamicUsers)*1.0 + cardinality(c2.dynamicUsers)*1.0 - cardinality(array_intersect(c1.dynamicUsers, c2.dynamicUsers))*1.0))
       similarity,
       cardinality(c1.users) userCount1,
       cardinality(c2.users) userCount2,
@@ -136,7 +136,10 @@ def getGalleryMap():
             distance_matrix[index2, index1] = 1.0/similarity
     #pos = umap(distance_matrix, min_dist=0, n_neighbors=min(200,cardinality-1), random_state=42)
     log('cluster galleries..')
-    pos = umap(distance_matrix, min_dist=0, n_neighbors=cardinality//8, random_state=42)
+    pos = umap(distance_matrix, min_dist=0.0, n_neighbors=cardinality//16, random_state=42)
+    pos -= pos.min(axis=0)
+    pos /= pos.max(axis=0)
+    '''
     scaled_pos = []
     scaled_indexes = []
     index_to_scaled_coordinate_index = [[] for _ in range(len(gallery_ids))]
@@ -146,19 +149,30 @@ def getGalleryMap():
             scaled_indexes.append(i)
             index_to_scaled_coordinate_index[i].append(len(scaled_pos)-1)
     scaled_pos = np.array(scaled_pos)
-    #cluster = hdbscan.HDBSCAN(metric='precomputed')
-    #cluster.fit(distance_matrix)
     coordinate = grid(scaled_pos ,3)
+    '''
+    #pos = umap(distance_matrix, min_dist=0.0, n_neighbors=cardinality//16, random_state=42, n_components=50)
+    pos2 = umap(distance_matrix, min_dist=0.0, n_neighbors=cardinality//16, random_state=42, n_components=20)
+    cluster = hdbscan.HDBSCAN(cluster_selection_method='leaf', prediction_data=True, cluster_selection_epsilon=0.01)
+    clusterer = cluster.fit(pos2)
+    soft_cluster = hdbscan.all_points_membership_vectors(clusterer)
+    soft_cluster = [int(np.argmax(x)) for x in soft_cluster]
+
+    area = sum(gallery_user_cardinalities[i])*3
+    radiuses = [(car/area)**0.5 for car in gallery_user_cardinalities]
 
     galleries = [{
         'id': id, 
         'name': index.get(id), 
-        'userCount': gallery_id_to_user_cardinalities[id], 
+        'userCount': gallery_user_cardinalities[i], 
         'relativeGalleries': [{
-            'index': x[0], 
+            'index': x[0],
             'commonUserCount': x[1]
             } for x in sorted(relative_galleries[id], key=lambda x: -x[1])[:10]],
-        'coordinates': [coordinate[ci].tolist() for ci in index_to_scaled_coordinate_index[i]]
+        #'coordinates': [coordinate[ci].tolist() for ci in index_to_scaled_coordinate_index[i]],
+        'node': {'x': float(pos[i][0]), 'y': float(pos[i][1]), 'r': radiuses[i] },
+        'cluster': int(cluster.labels_[i]),
+        'softcluster': soft_cluster[i],
         } for i, id in enumerate(gallery_ids)]
     return galleries
 

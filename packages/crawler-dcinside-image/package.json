@@ -18,7 +18,7 @@
     "test": "jest",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc && npm install",
+    "compile": "tsc",
     "tsc": "tsc",
     "fix": "gts fix"
   },
@@ -37,7 +37,7 @@
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
     "@programming-gallery/crawler-core": "^0.1.1",
     "aws-sdk": "^2.723.0",
-    "dcinside-crawler": "0.1.0"
+    "dcinside-crawler": "0.1.3"
   },
   "gitHead": "7d5a7641f6cd06a9c3f71aeabeec0d70e84ecf55"
 }

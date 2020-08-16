@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dcinside-crawler": "0.0.8",
+    "dcinside-crawler": "0.1.0",
     "sqsqs": "^0.2.8"
   },
   "jest": {

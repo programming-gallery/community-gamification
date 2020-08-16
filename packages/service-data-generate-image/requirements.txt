@@ -2,6 +2,6 @@ numpy
 # tqdm==4.19.5
 lapjv
 scipy
-# hdbscan
+hdbscan
 umap-learn
 boto3

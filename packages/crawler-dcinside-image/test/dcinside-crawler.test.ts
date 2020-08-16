@@ -1,5 +1,5 @@
 jest.setTimeout(25000);
-import Crawler from 'dcinside-crawler';
+import { Crawler } from 'dcinside-crawler';
 
 
 describe('dcinside-crawler', () => {

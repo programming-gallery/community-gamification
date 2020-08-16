@@ -1,15 +1,26 @@
+jest.setTimeout(60*1000*10);
 process.env = {
   DOCUMENT_TABLE_NAME: 'document',
   AWS_CONFIG: '{"endpoint": "http://localhost:4566", "region": "ap-northeast-2"}',
   //AWS_CONFIG: '{"region": "ap-northeast-2"}',
 }
+import { mocked } from 'ts-jest/utils'
 import { Contract, Manager, IWorker, IHistory, IHistoryConstructor, buildHistory } from '@programming-gallery/crawler-core';
 import { DcinsideWorker } from '../src/dcinside-worker';
 import Queue from 'sqsqs';
 import { main } from '../src';
 import Firehose from 'aws-sdk/clients/firehose';
-const firehose = new Firehose({region: 'ap-northeast-2'})
-jest.setTimeout(600000);
+jest.mock('aws-sdk/clients/firehose', () => {
+  return function (this: any) {
+    this.putRecord = function() {
+      return {
+        promise: () => new Promise(resolve => resolve()),
+      };
+    }
+  }
+});
+const mockedFirehose = mocked(Firehose, true);
+//const firehose = new Firehose({region: 'ap-northeast-2'})
 
 describe('dcinside-worker', () => {
   let awsConfig = {'endpoint': 'http://localhost:4566', 'region': 'ap-northeast-2'};
@@ -53,12 +64,15 @@ describe('dcinside-worker', () => {
     process.env = {
       NORMAL_QUEUE_URL: normalQueue.option.QueueUrl, 
       PRIORITY_QUEUE_URL: priorityQueue.option.QueueUrl,
+      PRIORITY_WORK_COUNT: '1',
+      NORMAL_WORK_COUNT: '0',
       HISTORY_TABLE_NAME: historyTableName,
       DELIVERY_STREAM_NAME: deliveryStreamName,
       AWS_CONFIG: JSON.stringify(awsConfig),
     };
-    priorityQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
-    normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
+    priorityQueue.send([JSON.stringify({id: 'programming', trackingKey: 1 })]);
+    //normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
+    await main();
     await main();
     /*let docs: Document[] = [];
     for await (const doc of dataMapper.scan(Document)) {

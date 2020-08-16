@@ -83,6 +83,19 @@ export class DcinsideCrawler extends cdk.Construct {
       },{
         name: 'userId',
         type: glue.Schema.STRING,
+      },{
+        name: 'viewCount',
+        type: glue.Schema.INTEGER,
+      },{
+        name: 'comments',
+        type: glue.Schema.array(glue.Schema.struct([
+          { name: 'id', type: glue.Schema.INTEGER, },
+          { name: 'userId', type: glue.Schema.STRING, },
+          { name: 'userIp', type: glue.Schema.STRING, },
+          { name: 'userNickname', type: glue.Schema.STRING, },
+          { name: 'createdAt', type: glue.Schema.TIMESTAMP, },
+          { name: 'parentId', type: glue.Schema.INTEGER, },
+        ])),
       }],
     });
     //glueTable.node.defaultChild.addPropertyOverride('TableInput.StorageDescriptor.Columns', mergedColumns.getAtt("StorageDescriptor.Columns"));

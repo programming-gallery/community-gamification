@@ -1,0 +1,7 @@
+numpy
+# tqdm==4.19.5
+lapjv
+scipy
+# hdbscan
+umap-learn
+boto3

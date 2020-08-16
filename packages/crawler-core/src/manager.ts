@@ -31,11 +31,12 @@ export class Manager {
       WaitTimeSeconds: 1,
     }, options.awsConfig);
     this.worker = worker;
-    this.priorityWorkCount = options.priorityWorkCount || 10; 
-    this.normalWorkCount = options.normalWorkCount || 1; 
+    this.priorityWorkCount = options.priorityWorkCount===undefined? 10 : options.priorityWorkCount; 
+    this.normalWorkCount = options.normalWorkCount===undefined? 1 : options.normalWorkCount;
     this.HistoryConstructor = buildHistory(historyTableName, options.awsConfig);
   }
-  async manage(){
+  /*
+  async manage(): Promise<any>{
     console.log(new Date(), "fetch contracts..");
     let promises = [this.priorityQueue.receive(this.priorityWorkCount), this.normalQueue.receive(this.normalWorkCount)]
     const messages = (await Promise.all(promises)).flat();
@@ -69,5 +70,41 @@ export class Manager {
     await this.priorityQueue.delete(await promises[0]);
     await this.normalQueue.delete(await promises[1]);
     console.log(new Date(), "done");
+  }*/
+  async manage() {
+    for(let i=0; i<this.priorityWorkCount; ++i){
+      const [message] = await this.priorityQueue.receive(1);
+      const contract = JSON.parse(message.Body!);
+      const history = await this.HistoryConstructor.getOrCreate(contract.id);
+      try {
+        await this.worker.work(contract, history);
+        const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
+        if(history.isPriority())
+          await this.priorityQueue.send([JSON.stringify(nextContract)]);
+        else
+          await this.normalQueue.send([JSON.stringify(nextContract)]);
+        await history.save(nextContract.trackingKey);
+        await this.priorityQueue.delete([message]);
+      } catch(e) {
+        console.log(e);
+      }
+    }
+    for(let i=0; i<this.normalWorkCount; ++i) {
+      const [message] = await this.normalQueue.receive(1);
+      const contract = JSON.parse(message.Body!);
+      const history = await this.HistoryConstructor.getOrCreate(contract.id);
+      try {
+        await this.worker.work(contract, history);
+        const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
+        if(history.isPriority())
+          await this.priorityQueue.send([JSON.stringify(nextContract)]);
+        else
+          await this.normalQueue.send([JSON.stringify(nextContract)]);
+        await history.save(nextContract.trackingKey);
+        await this.normalQueue.delete([message]);
+      } catch(e) {
+        console.log(e);
+      }
+    }
   }
 }

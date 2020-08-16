@@ -92,7 +92,7 @@ export class Crawler extends cdk.Construct {
       vpc,
       desiredTaskCount,
       image,
-      visibilityTimeout = cdk.Duration.seconds(300), 
+      visibilityTimeout = cdk.Duration.seconds(600), 
       cluster = new ecs.Cluster(this, 'Cluster', { vpc }) ,
       memoryLimitMiB = 512,
       cpu = 256,

@@ -28,17 +28,22 @@ export async function main(){
   } = process.env;
   if(NORMAL_QUEUE_URL === undefined || PRIORITY_QUEUE_URL === undefined || HISTORY_TABLE_NAME === undefined)
     throw Error("Environment variable NORMAL_QUEUE_URL, PRIORITY_QUEUE_URL, RESULT_QUEUE_URL, HISTORY_TABLE_NAME not set");
-  let awsConfig = undefined;
-  if(AWS_CONFIG !== undefined)
-    awsConfig = JSON.parse(AWS_CONFIG);
-  let rps = parseInt(RPS || '');
-  let retries = parseInt(RETRIES || '');
-  let priorityWorkCount = parseInt(PRIORITY_WORK_COUNT || '100');
-  let normalWorkCount = parseInt(NORMAL_WORK_COUNT || '1');
-  const worker = new DcinsideWorker(isNaN(rps)? undefined: rps, isNaN(retries)? undefined: retries);
-  const manager = new Manager(PRIORITY_QUEUE_URL, NORMAL_QUEUE_URL, HISTORY_TABLE_NAME, worker, { priorityWorkCount, normalWorkCount, awsConfig: awsConfig });
-  await manager.manage();
-  //process.exit(1);
+  try{
+    let awsConfig = undefined;
+    if(AWS_CONFIG !== undefined)
+      awsConfig = JSON.parse(AWS_CONFIG);
+    let rps = parseInt(RPS || '');
+    let retries = parseInt(RETRIES || '');
+    let priorityWorkCount = parseInt(PRIORITY_WORK_COUNT || '100');
+    let normalWorkCount = parseInt(NORMAL_WORK_COUNT || '1');
+    const worker = new DcinsideWorker(isNaN(rps)? undefined: rps, isNaN(retries)? undefined: retries);
+    const manager = new Manager(PRIORITY_QUEUE_URL, NORMAL_QUEUE_URL, HISTORY_TABLE_NAME, worker, { priorityWorkCount, normalWorkCount, awsConfig: awsConfig });
+    await manager.manage();
+  }catch(e){
+    console.log(e);
+  }finally {
+    process.exit(1);
+  }
 }
 
 if (typeof module !== 'undefined' && !module.parent) {

@@ -95,11 +95,11 @@ function saveHistoryCustomData(history: IHistory, docs: (DocumentHeader & { comm
 }
 interface ICustomData { 
   [key: number]: { 
-    commentCount: number,
-    likeCount: number,
-    viewCount: number,
-    lastCommentId: number,
-    lastDocumentId: number,
+    commentCount?: number,
+    likeCount?: number,
+    viewCount?: number,
+    lastCommentId?: number,
+    lastDocumentId?: number,
   }
 }
 function loadHistoryCustomData(history: IHistory): ICustomData {
@@ -107,10 +107,10 @@ function loadHistoryCustomData(history: IHistory): ICustomData {
   let documentIdToCustomData: ICustomData = {};
   if(lastHistoryCustomData){
     let parsed = JSON.parse(lastHistoryCustomData)
-    let documentIds = base64ToUint32Array(parsed.documentIds); 
-    let commentCounts = base64ToUint32Array(parsed.commentCounts); 
-    let likeCounts = base64ToUint32Array(parsed.likeCounts); 
-    let viewCounts = base64ToUint32Array(parsed.viewCounts); 
+    let documentIds = parsed.documentIds? base64ToUint32Array(parsed.documentIds): []; 
+    let commentCounts = parsed.commentCounts? base64ToUint32Array(parsed.commentCounts): []; 
+    let likeCounts = parsed.likeCounts? base64ToUint32Array(parsed.likeCounts) : []; 
+    let viewCounts = parsed.viewCounts? base64ToUint32Array(parsed.viewCounts) : []; 
     let lastCommentId = parsed.lastCommentId;
     let lastDocumentId = parsed.lastDocumentId;
     for(let i=0, l=documentIds.length; i<l; ++i){
@@ -142,13 +142,13 @@ export class DcinsideWorker implements IWorker {
     let coveringDocuments = 1000;
     const customDatas = loadHistoryCustomData(history);
     const lastDocumentId = customDatas[parseInt(Object.keys(customDatas)[0])]?.lastDocumentId;
-    console.log(new Date(), 'crawling start:', id);
+    console.log(new Date(), 'crawling start:', id, 'lastDocumentId:', lastDocumentId);
     const iter = await this.crawler.documentHeaderWithCommentAsyncIterator({
       gallery: {
         id,
         isMiner: isMiner && isMiner !== 'false'? true : false,
       },
-      lastDocumentId: lastDocumentId !== undefined? lastDocumentId - coveringDocuments: undefined,
+      lastDocumentId: lastDocumentId !== undefined && lastDocumentId - coveringDocuments > 0? lastDocumentId - coveringDocuments: undefined,
       //limit: 100,
     });
     let docs = [];
@@ -156,13 +156,15 @@ export class DcinsideWorker implements IWorker {
     for await (const doc of iter) {
       //const updatingDocument = documents.filter(doc => documentIdToCommentCounts[doc.id] === undefined || documentIdToCommentCounts[doc.id] !== doc.commentCount);
       docs.push(doc)
+      if(updatingDocumentCount % 10 === 0)
+        console.log('updating:', id, isMiner, doc.id, updatingDocumentCount);
       let customData = customDatas[doc.id];
       if(customData === undefined || 
         customData.commentCount !== doc.commentCount ||
-        customData.viewCount*2 < doc.viewCount ||
+        (customData.viewCount || 0)*2 < doc.viewCount ||
         customData.likeCount !== doc.likeCount){
         if(customData && customData.lastCommentId)
-          doc.comments = doc.comments.filter(com => com.id > customData.lastCommentId);
+          doc.comments = doc.comments.filter(com => com.id > (customData.lastCommentId || 0));
         await firehose.putRecord({
           DeliveryStreamName: DELIVERY_STREAM_NAME!,
           Record: {

@@ -64,15 +64,15 @@ describe('dcinside-worker', () => {
     process.env = {
       NORMAL_QUEUE_URL: normalQueue.option.QueueUrl, 
       PRIORITY_QUEUE_URL: priorityQueue.option.QueueUrl,
+      RPS: '30',
       PRIORITY_WORK_COUNT: '1',
       NORMAL_WORK_COUNT: '0',
       HISTORY_TABLE_NAME: historyTableName,
       DELIVERY_STREAM_NAME: deliveryStreamName,
       AWS_CONFIG: JSON.stringify(awsConfig),
     };
-    priorityQueue.send([JSON.stringify({id: 'programming', trackingKey: 1 })]);
+    priorityQueue.send([JSON.stringify({id: 'zkdhfn', isMiner: true, trackingKey: 1 })]);
     //normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
-    await main();
     await main();
     /*let docs: Document[] = [];
     for await (const doc of dataMapper.scan(Document)) {

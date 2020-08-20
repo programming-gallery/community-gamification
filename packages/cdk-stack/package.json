@@ -1,6 +1,6 @@
 {
   "name": "@programming-gallery/cdk-stack",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",

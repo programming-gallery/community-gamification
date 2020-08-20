@@ -31,7 +31,8 @@ describe('dcinside-worker', () => {
   let awsConfig = {'endpoint': 'http://localhost:4566', 'region': 'ap-northeast-2'};
   //let awsConfig = {'region': 'ap-northeast-2'};
   let historyTableName = 'test-table';
-  let deliveryStreamName = 'test-stream';
+  let docDeliveryStreamName = 'doc-test-stream';
+  let comDeliveryStreamName = 'com-test-stream';
   let History = buildHistory(historyTableName, awsConfig);
   let normalQueue: Queue;
   let priorityQueue: Queue;
@@ -73,11 +74,14 @@ describe('dcinside-worker', () => {
       PRIORITY_WORK_COUNT: '1',
       NORMAL_WORK_COUNT: '0',
       HISTORY_TABLE_NAME: historyTableName,
-      DELIVERY_STREAM_NAME: deliveryStreamName,
+      DOCUMENT_DELIVERY_STREAM_NAME: docDeliveryStreamName,
+      COMMENT_DELIVERY_STREAM_NAME: comDeliveryStreamName,
       AWS_CONFIG: JSON.stringify(awsConfig),
+      DEBUG: 'true',
     };
     priorityQueue.send([JSON.stringify({id: 'onceagain#true', trackingKey: 1 })]);
     //normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
+    await main();
     await main();
     /*let docs: Document[] = [];
     for await (const doc of dataMapper.scan(Document)) {

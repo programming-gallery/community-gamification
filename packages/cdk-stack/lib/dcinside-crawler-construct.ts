@@ -43,7 +43,52 @@ export class DcinsideCrawler extends cdk.Construct {
       stream: dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
     });
     */
-    const deliveryStream = new DeliveryStream(scope, id + 'DeliveryStream', {
+    const comDeliveryStream = new DeliveryStream(scope, id + 'DeliveryStream', {
+      //vpc,
+      //cluster,
+      tableName: 'dcinside_document',
+      columns: [{
+        name: 'galleryId',
+        type: glue.Schema.STRING,
+      },{
+        name: 'galleryIsMiner',
+        type: glue.Schema.BOOLEAN,
+      },{
+        name: 'id',
+        type: glue.Schema.BIG_INT,
+      },{
+        name: 'createdAt',
+        type: glue.Schema.TIMESTAMP,
+      },{
+        name: 'userNickname',
+        type: glue.Schema.STRING,
+      },{
+        name: 'userIp',
+        type: glue.Schema.STRING,
+      },{
+        name: 'userId',
+        type: glue.Schema.STRING,
+      },{
+        name: 'contents',
+        type: glue.Schema.STRING,
+      },{
+        name: 'voiceCopyId',
+        type: glue.Schema.STRING,
+      }, {
+        name: 'dcconImageUrl',
+        type: glue.Schema.STRING,
+      },{
+        name: 'dcconName',
+        type: glue.Schema.STRING,
+      },{
+        name: 'dcconPackageId',
+        type: glue.Schema.STRING,
+      },{
+        name: 'parentId',
+        type: glue.Schema.BIG_INT,
+      }],
+    })
+    const docDeliveryStream = new DeliveryStream(scope, id + 'DeliveryStream', {
       //vpc,
       //cluster,
       tableName: 'dcinside_document',
@@ -89,6 +134,12 @@ export class DcinsideCrawler extends cdk.Construct {
       },{
         name: 'contents',
         type: glue.Schema.STRING,
+      }, {
+        name: 'dislikeCount',
+        type: glue.Schema.INTEGER,
+      }, {
+        name: 'staticlikeCount',
+        type: glue.Schema.INTEGER,
       }],
     });
     //glueTable.node.defaultChild.addPropertyOverride('TableInput.StorageDescriptor.Columns', mergedColumns.getAtt("StorageDescriptor.Columns"));
@@ -105,7 +156,8 @@ export class DcinsideCrawler extends cdk.Construct {
       desiredTaskCount,
       environment: {
         //'DOCUMENT_TABLE_NAME': documentTable.tableName,
-        'DELIVERY_STREAM_NAME': deliveryStream.deliveryStream.deliveryStreamName!,
+        'COMMENT_DELIVERY_STREAM_NAME': comeliveryStream.deliveryStream.deliveryStreamName!,
+        'DOCUMENT_DELIVERY_STREAM_NAME': docDeliveryStream.deliveryStream.deliveryStreamName!,
         'RPS': '30',
         'PRIORITY_WORK_COUNT': '20',
         'NORMAL_WORK_COUNT': '1',

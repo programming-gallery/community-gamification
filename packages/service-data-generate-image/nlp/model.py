@@ -13,17 +13,18 @@ from soynlp.normalizer import *
 
 from gensim.corpora.dictionary import Dictionary
 from gensim.models.word2vec import Word2Vec
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.ldamodel  import LdaModel
 from gensim.models.nmf import Nmf
 from gensim.models.phrases import Phrases, Phraser
 
 import guidedlda
 from scipy.sparse import lil_matrix
-#from gensim.models.doc2vec import Word2Vec
+
 
 KEY = 'tagger'
 
-MECAB_KO_DIC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'mecab/staging/mecab-ko-dic-2.1.1-20180720'))
+MECAB_KO_DIC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'thirdparty/mecab-ko-dic-2.1.1-20180720'))
 
 print(MECAB_KO_DIC_PATH)
 
@@ -78,7 +79,7 @@ class Model:
         return ['#'.join(t) for t in self.tag(text, stem=True)]
     def __symantics(self, text):
         return ['#'.join(t) for t in self.tag(text, symantic=True)]
-    def __trainWord2Vec(self, documentpaths):
+    def trainWord2Vec(self, documentpaths):
         lines = []
         for fout in documentpaths:
             with open(fout) as hin:
@@ -86,6 +87,23 @@ class Model:
                     lines.append(self.__tokenize(line))
         print('w2v input ex:', lines[0])
         self.word2vec = Word2Vec(lines, size=100, window=20, workers=8, sg=1)
+    def trainDoc2Vec(self, documentpaths, tags):
+        lines = []
+        lineIndexTotag = []
+        print("tokenize..")
+        for fout, tag in zip(documentpaths, tags):
+            with open(fout) as hin:
+                for line in hin:
+                    lines.append(self.__tokenize(line))
+                    lineIndexTotag.append(tag)
+        print("join phrase..")
+        phrases = Phrases(lines)
+        taggedlines = []
+        for line, tag in zip(lines, lineIndexTotag):
+            taggedlines.append(TaggedDocument(phrases[line], [tag]))
+        print('d2v input ex:', taggedlines[0])
+        print("start doc2vec training..")
+        self.doc2vec = Doc2Vec(taggedlines, vector_size=100, window=20, workers=8, dm=0)
     def genSTMMTrainingSet(self, documentpaths, outpath):
         lines = []
         for fout in documentpaths:
@@ -141,13 +159,14 @@ class Model:
         model = guidedlda.GuidedLDA(n_topics=5, n_iter=100, random_state=7, refresh=20)
         model.fit(X)
         return [[(dictionary[k], topic_dist[k]) for k in np.argsort(topic_dist)[::-1]] for i, topic_dist in enumerate(model.topic_word_)]
-    def train(self, documentpaths, minnounscore=0.3, minnounfreq=10):
+    def train(self, documentpaths, tags, minnounscore=0.3, minnounfreq=10):
         print(datetime.datetime.now(), 'train normalizer..')
         #self.__trainNormalizer(documentpaths)
         print(datetime.datetime.now(), 'train tokenizer..')
         #self.__trainTokenizer(documentpaths, minnounscore, minnounfreq)
         #print('train word2vec..')
-        self.__trainWord2Vec(documentpaths)
+        #self.trainWord2Vec(documentpaths)
+        self.trainDoc2Vec(documentpaths, tags)
         #self.__trainWord2Vec(documentpaths)
     def load(self, dir):
         with open(os.path.join(dir, 'nouns.pkl'), 'rb') as f:
@@ -156,6 +175,7 @@ class Model:
             self.compound_nouns = pickle.load(f)
         self.spacer.load_model(os.path.join(dir, 'soyspace'), json_format=False)
         self.word2vec = Word2Vec.load(os.path.join(dir, 'word2vec.model'))
+        self.doc2vec = Doc2Vec.load(os.path.join(dir, 'doc2vec.model'))
         #self.dictionary = Dictionary.load(os.path.join(dir, 'dictionary.gensim'))
     def save(self, dir):
         try:
@@ -168,7 +188,8 @@ class Model:
         with open(os.path.join(dir, 'compound-nouns.pkl'), 'wb') as f:
             pickle.dump(self.compound_nouns, f)
         self.word2vec.save(os.path.join(dir, 'word2vec.model'))
-        self.dictionary.save(os.path.join(dir, 'dictionary.gensim'))
+        self.doc2vec.save(os.path.join(dir, 'doc2vec.model'))
+        #self.dictionary.save(os.path.join(dir, 'dictionary.gensim'))
     def tag(self, s, stem=False, symantic=False):
         #symantics = set(('NNG', 'NNP', 'NNB', 'NR', 'NP', 'VV', 'VA', 'VX', 'VCP', 'VCN', 'MM', 'MAG', 'MAJ', 'IC'))
         s = repeat_normalize(s, num_repeats=3)

@@ -1,10 +1,11 @@
 import { IWorker, Contract, IHistory } from '@programming-gallery/crawler-core';
-import { Crawler, DocumentHeader, Comment } from 'dcinside-crawler';
+import { Crawler, DocumentHeader, DocumentBody, Comment } from 'dcinside-crawler';
 const {
   AWS_CONFIG,
 } = process.env;
 import Firehose from 'aws-sdk/clients/firehose';
 const firehose = new Firehose(Object.assign({apiVersion: '2015-08-04'}, AWS_CONFIG? JSON.parse(AWS_CONFIG): {}));
+
 
 function chunk<T>(arr: T[], chunk_size: number): T[][] {
   var R = [];
@@ -13,27 +14,60 @@ function chunk<T>(arr: T[], chunk_size: number): T[][] {
   return R;
 }
 
-function adapt(doc: DocumentHeader, customData?: any){
+function adaptComments(comments: Comment[], customData?: any){
+  let parsed = comments.map(com => ({
+    galleryId: com.document.gallery.id,
+    galleryIsMiner: com.document.gallery.isMiner,
+
+    documentId: com.document.id,
+
+    id: com.id,
+    createdAt: com.createdAt,
+
+    userNickname: com.author.nickname,
+    userIp: com.author.ip,
+    userId: com.author.id,
+
+    contents: com.contents,
+    voiceCopyId: com.voiceCopyId,
+    dcconImageUrl: com.dccon?.imageUrl,
+    dcconName: com.dccon?.name,
+    dcconPackageId: com.dccon?.packageId,
+    parentId: com.parent?.id,
+  }));
+  if(customData === undefined)
+    return parsed;
+  else if(customData.lastCommentId !== undefined)
+    return parsed.filter(c => c.id > customData.lastCommentId)
+  else
+    return parsed;
+}
+
+function adaptDocument(head: DocumentHeader, body?: DocumentBody, customData?: any){
   if(customData === undefined)
     return {
-      galleryId: doc.gallery.id,
-      galleryIsMiner: doc.gallery.isMiner,
+      galleryId: head.gallery.id,
+      galleryIsMiner: head.gallery.isMiner,
 
-      id: doc.id,
-      title: doc.title,
-      commentCount: doc.commentCount,
-      likeCount: doc.likeCount,
-      hasImage: doc.hasImage,
-      hasVideo: doc.hasVideo,
-      createdAt: doc.createdAt,
+      id: head.id,
+      title: head.title,
+      commentCount: head.commentCount,
+      likeCount: head.likeCount,
+      hasImage: head.hasImage,
+      hasVideo: head.hasVideo,
+      createdAt: head.createdAt,
 
-      userNickname: doc.author.nickname,
-      userIp: doc.author.ip,
-      userId: doc.author.id,
+      userNickname: head.author.nickname,
+      userIp: head.author.ip,
+      userId: head.author.id,
 
-      viewCount: doc.viewCount,
+      viewCount: head.viewCount,
+
+      contents: body?.contents,
+      dislikeCount: body?.dislikeCount,
+      staticLikeCount: body?.staticLikeCount,
       /*
-      comments: doc.comments.map(com => ({
+      comments: doc.comments?.map(com => ({
         id: com.id,
         userId: com.author.id,
         userIp: com.author.ip,
@@ -43,15 +77,15 @@ function adapt(doc: DocumentHeader, customData?: any){
       })),
       */
     };
-  else
+  else 
     return {
-      galleryId: doc.gallery.id,
+      galleryId: head.gallery.id,
 
-      id: doc.id,
-      commentCount: doc.commentCount,
-      likeCount: doc.likeCount,
+      id: head.id,
+      commentCount: head.commentCount,
+      likeCount: head.likeCount,
 
-      viewCount: doc.viewCount,
+      viewCount: head.viewCount,
       /*
       comments: doc.comments.map(com => ({
         id: com.id,
@@ -86,7 +120,7 @@ function saveHistoryCustomData(history: IHistory, docs: DocumentHeader[]) {
   for(let doc of docs){
     maxDocumentId = Math.max(maxDocumentId, doc.id);
   }
-  history.update(docs.length, docs[docs.length-1].createdAt.getTime(), docs[0].createdAt.getTime(), docs[0].id, 1.0, 
+  history.update(docs.length, docs[docs.length-1].createdAt.getTime(), docs[0].createdAt.getTime(), '' + docs[0].id, 1.0, 
   JSON.stringify({
     documentIds: uint32ArrayToBase64(docs.map(d => d.id)),
     lastDocumentId: maxDocumentId || undefined,
@@ -138,8 +172,11 @@ export class DcinsideWorker implements IWorker {
    */
   async work(contract: Contract, history: IHistory): Promise<void> {
     const {
-      DELIVERY_STREAM_NAME,
+      DOCUMENT_DELIVERY_STREAM_NAME,
+      COMMENT_DELIVERY_STREAM_NAME,
     } = process.env;
+    if(DOCUMENT_DELIVERY_STREAM_NAME === undefined || COMMENT_DELIVERY_STREAM_NAME === undefined)
+      throw Error("DOCUMENT_DELIVERY_STREAM_NAME, COMMENT_DELIVERY_STREAM_NAME env var not defined");
     const [ id, isMiner ] = contract.id.split('#');
     let coveringDocuments = 1000;
     const customDatas = loadHistoryCustomData(history);
@@ -150,18 +187,40 @@ export class DcinsideWorker implements IWorker {
         id,
         isMiner: isMiner && isMiner !== 'false'? true : false,
       },
-      lastDocumentId: lastDocumentId !== undefined && (lastDocumentId - coveringDocuments > 0? lastDocumentId: undefined) || lastDocumentId,
+      lastDocumentId: lastDocumentId != undefined && (lastDocumentId - coveringDocuments > 0? lastDocumentId - coveringDocuments: 1) || lastDocumentId,
       //limit: 100,
     });
-    let updatingDocuments = docs.filter(doc => {
+    console.log(new Date(), 'crawled documents:', docs.length);
+    let updatingDocuments: DocumentHeader[] = docs.filter(doc => {
       let customData = customDatas[doc.id];
       return customData === undefined || customData.commentCount !== doc.commentCount || (customData.viewCount || 0)*2 < doc.viewCount || customData.likeCount !== doc.likeCount;
-    });
+    })
+    let documentBody: {[id: string]: DocumentBody} = {};
+    /*for(let doc of updatingDocuments) {
+      let customData = customDatas[doc.id];
+      if(customData === undefined)
+        documentBody[doc.id] = await this.crawler.documentBody(doc);
+    }*/
+
+    let comments: any[] = [];
+    /*for(let doc of updatingDocuments) {
+      let customData = customDatas[doc.id];
+      if(customData === undefined || customData.commentCount !== doc.commentCount)
+        comments.push(...adaptComments(await this.crawler.comments(doc), customData));
+    }*/
+
     await Promise.all(chunk(updatingDocuments, 500).map(docs => 
       firehose.putRecordBatch({
-          DeliveryStreamName: DELIVERY_STREAM_NAME!,
+          DeliveryStreamName: DOCUMENT_DELIVERY_STREAM_NAME!,
           Records: docs.map(doc => ({
-            Data: Buffer.from(JSON.stringify(adapt(doc, customDatas[doc.id]))),
+            Data: Buffer.from(JSON.stringify(adaptDocument(doc, documentBody[doc.id], customDatas[doc.id]))),
+          })),
+      }).promise()));
+    await Promise.all(chunk(comments, 500).map(coms => 
+      firehose.putRecordBatch({
+          DeliveryStreamName: COMMENT_DELIVERY_STREAM_NAME!,
+          Records: coms.map(com => ({
+            Data: Buffer.from(JSON.stringify(com)),
           })),
       }).promise()));
     saveHistoryCustomData(history, docs);
@@ -170,7 +229,6 @@ export class DcinsideWorker implements IWorker {
       lastCommentId: docs.
       commentCounts: uint32ArrayToBase64(docs.map(d => d.commentCount)),
     });*/
-    console.log(new Date(), 'crawled documents:', docs.length);
     console.log(new Date(), 'updating documents:', updatingDocuments.length);
     //const res = Promise.all(chunk(updatingDocuments, 500).map(documents => 
   }

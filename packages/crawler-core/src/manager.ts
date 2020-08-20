@@ -77,13 +77,16 @@ export class Manager {
         const [message] = await this.priorityQueue.receive(1);
         const contract = JSON.parse(message.Body!);
         const history = await this.HistoryConstructor.getOrCreate(contract.id);
-        await this.worker.work(contract, history);
-        const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
-        if(history.isPriority())
-          await this.priorityQueue.send([JSON.stringify(nextContract)]);
-        else
-          await this.normalQueue.send([JSON.stringify(nextContract)]);
-        await history.save(nextContract.trackingKey);
+        if(history.isValid(contract.trackingKey)){
+          await this.worker.work(contract, history);
+          const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
+          if(await history.save(nextContract.trackingKey)) {
+            if(history.isPriority())
+              await this.priorityQueue.send([JSON.stringify(nextContract)]);
+            else
+              await this.normalQueue.send([JSON.stringify(nextContract)]);
+          }
+        }
         await this.priorityQueue.delete([message]);
       } catch(e) {
         console.log(e);
@@ -94,13 +97,16 @@ export class Manager {
         const [message] = await this.normalQueue.receive(1);
         const contract = JSON.parse(message.Body!);
         const history = await this.HistoryConstructor.getOrCreate(contract.id);
-        await this.worker.work(contract, history);
-        const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
-        if(history.isPriority())
-          await this.priorityQueue.send([JSON.stringify(nextContract)]);
-        else
-          await this.normalQueue.send([JSON.stringify(nextContract)]);
-        await history.save(nextContract.trackingKey);
+        if(history.isValid(contract.trackingKey)){
+          await this.worker.work(contract, history);
+          const nextContract = Object.assign(contract, { trackingKey : new Date().getTime() + Math.random() });
+          if(await history.save(nextContract.trackingKey)) {
+            if(history.isPriority())
+              await this.priorityQueue.send([JSON.stringify(nextContract)]);
+            else
+              await this.normalQueue.send([JSON.stringify(nextContract)]);
+          }
+        }
         await this.normalQueue.delete([message]);
       } catch(e) {
         console.log(e);

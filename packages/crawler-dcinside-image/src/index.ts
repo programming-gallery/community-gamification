@@ -25,6 +25,7 @@ export async function main(){
     AWS_CONFIG,
     RPS,
     RETRIES,
+    DEBUG,
   } = process.env;
   if(NORMAL_QUEUE_URL === undefined || PRIORITY_QUEUE_URL === undefined || HISTORY_TABLE_NAME === undefined)
     throw Error("Environment variable NORMAL_QUEUE_URL, PRIORITY_QUEUE_URL, RESULT_QUEUE_URL, HISTORY_TABLE_NAME not set");
@@ -42,7 +43,7 @@ export async function main(){
   }catch(e){
     console.log(e);
   }
-  //process.exit(1);
+  if(!DEBUG) process.exit(1);
 }
 
 if (typeof module !== 'undefined' && !module.parent) {

@@ -9,12 +9,14 @@ from nlp.athena import saveCorpusByGalleryId, saveCorpus
 if __name__ == "__main__":
     corpuspath = '/tmp/corpus.txt'
     gallerycorpusdir = '/tmp/gallery-corpuses'
-    modeldir = 'test-model'
+    modeldir = 'nlp/models/test-model'
     #saveCorpus(corpuspath)
     #saveCorpusByGalleryId(gallerycorpusdir)
     model = Model(override=False)
     model.load(modeldir)
-    print(model.tag('레디컬 페미니스트', stem=True))
+    #print(model.tag('레디컬 페미니스트', stem=True))
+    #print(model.doc2vec.docvecs.most_similar('gotoyome#kgm12345.txt'))
+    #print(model.doc2vec.docvecs.most_similar(1))
     #print(model.word2vec.wv.most_similar(positive=['이명박#NNP'], negative=[], topn=100))
     #print(model.word2vec.wv.most_similar(positive=['엄마#NNG', '보지#NNG'], negative=['아빠#NNP'], topn=100))
     #l = ['박근혜#NNP', '문재인#NNP', '이명박#NNP', '박정희#NNP', '노무현#NNP']

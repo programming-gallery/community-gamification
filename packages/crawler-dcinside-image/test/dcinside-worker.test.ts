@@ -17,6 +17,11 @@ jest.mock('aws-sdk/clients/firehose', () => {
         promise: () => new Promise(resolve => resolve()),
       };
     }
+    this.putRecordBatch = function() {
+      return {
+        promise: () => new Promise(resolve => resolve()),
+      };
+    }
   }
 });
 const mockedFirehose = mocked(Firehose, true);
@@ -71,7 +76,7 @@ describe('dcinside-worker', () => {
       DELIVERY_STREAM_NAME: deliveryStreamName,
       AWS_CONFIG: JSON.stringify(awsConfig),
     };
-    priorityQueue.send([JSON.stringify({id: 'zkdhfn', isMiner: true, trackingKey: 1 })]);
+    priorityQueue.send([JSON.stringify({id: 'onceagain#true', trackingKey: 1 })]);
     //normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
     await main();
     /*let docs: Document[] = [];

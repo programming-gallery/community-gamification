@@ -41,7 +41,7 @@ export interface IHistory {
   /**
    * Update history. the changes are not saved. To save, invoke save method.
    */
-  update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string, weight?: number): void ;
+  update(documentCount: number, firstPostedTimestamp: number, lastPostedTimestamp: number, lastPostedDocumentId?: string, weight?: number, customData?: string): void;
   /**
    * Save with a tracking key. it might fail if another worker update the same history.
    *

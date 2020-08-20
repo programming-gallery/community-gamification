@@ -13,7 +13,7 @@ function chunk<T>(arr: T[], chunk_size: number): T[][] {
   return R;
 }
 
-function adapt(doc: DocumentHeader & { comments: Comment[] }, customData?: any){
+function adapt(doc: DocumentHeader, customData?: any){
   if(customData === undefined)
     return {
       galleryId: doc.gallery.id,
@@ -32,6 +32,7 @@ function adapt(doc: DocumentHeader & { comments: Comment[] }, customData?: any){
       userId: doc.author.id,
 
       viewCount: doc.viewCount,
+      /*
       comments: doc.comments.map(com => ({
         id: com.id,
         userId: com.author.id,
@@ -40,6 +41,7 @@ function adapt(doc: DocumentHeader & { comments: Comment[] }, customData?: any){
         createdAt: com.createdAt,
         parentId: com.parent?.id,
       })),
+      */
     };
   else
     return {
@@ -50,6 +52,7 @@ function adapt(doc: DocumentHeader & { comments: Comment[] }, customData?: any){
       likeCount: doc.likeCount,
 
       viewCount: doc.viewCount,
+      /*
       comments: doc.comments.map(com => ({
         id: com.id,
         userId: com.author.id,
@@ -58,6 +61,7 @@ function adapt(doc: DocumentHeader & { comments: Comment[] }, customData?: any){
         createdAt: com.createdAt,
         parentId: com.parent?.id,
       })),
+      */
     }
 }
 
@@ -76,22 +80,20 @@ function base64ToUint32Array(base64: string) {
 }
 */
 
-function saveHistoryCustomData(history: IHistory, docs: (DocumentHeader & { comments: Comment[] })[]) {
+function saveHistoryCustomData(history: IHistory, docs: DocumentHeader[]) {
   let maxCommentId = 0;
   let maxDocumentId = 0;
   for(let doc of docs){
-    for(let comm of doc.comments)
-      maxCommentId = Math.max(maxCommentId, comm.id);
     maxDocumentId = Math.max(maxDocumentId, doc.id);
   }
-  history.data.customData = JSON.stringify({
+  history.update(docs.length, docs[docs.length-1].createdAt.getTime(), docs[0].createdAt.getTime(), docs[0].id, 1.0, 
+  JSON.stringify({
     documentIds: uint32ArrayToBase64(docs.map(d => d.id)),
-    lastCommentId: maxCommentId || undefined,
     lastDocumentId: maxDocumentId || undefined,
     commentCounts: uint32ArrayToBase64(docs.map(d => d.commentCount)),
     viewCounts: uint32ArrayToBase64(docs.map(d => d.viewCount)),
     likeCounts: uint32ArrayToBase64(docs.map(d => d.likeCount)),
-  });
+  }));
 }
 interface ICustomData { 
   [key: number]: { 
@@ -142,38 +144,26 @@ export class DcinsideWorker implements IWorker {
     let coveringDocuments = 1000;
     const customDatas = loadHistoryCustomData(history);
     const lastDocumentId = customDatas[parseInt(Object.keys(customDatas)[0])]?.lastDocumentId;
-    console.log(new Date(), 'crawling start:', id, 'lastDocumentId:', lastDocumentId);
-    const iter = await this.crawler.documentHeaderWithCommentAsyncIterator({
+    console.log(new Date(), 'crawling start:', id, isMiner, 'lastDocumentId:', lastDocumentId);
+    const docs = await this.crawler.documentHeaders({
       gallery: {
         id,
         isMiner: isMiner && isMiner !== 'false'? true : false,
       },
-      lastDocumentId: lastDocumentId !== undefined && lastDocumentId - coveringDocuments > 0? lastDocumentId - coveringDocuments: undefined,
+      lastDocumentId: lastDocumentId !== undefined && (lastDocumentId - coveringDocuments > 0? lastDocumentId: undefined) || lastDocumentId,
       //limit: 100,
     });
-    let docs = [];
-    let updatingDocumentCount = 0;
-    for await (const doc of iter) {
-      //const updatingDocument = documents.filter(doc => documentIdToCommentCounts[doc.id] === undefined || documentIdToCommentCounts[doc.id] !== doc.commentCount);
-      docs.push(doc)
-      if(updatingDocumentCount % 10 === 0)
-        console.log('updating:', id, isMiner, doc.id, updatingDocumentCount);
+    let updatingDocuments = docs.filter(doc => {
       let customData = customDatas[doc.id];
-      if(customData === undefined || 
-        customData.commentCount !== doc.commentCount ||
-        (customData.viewCount || 0)*2 < doc.viewCount ||
-        customData.likeCount !== doc.likeCount){
-        if(customData && customData.lastCommentId)
-          doc.comments = doc.comments.filter(com => com.id > (customData.lastCommentId || 0));
-        await firehose.putRecord({
+      return customData === undefined || customData.commentCount !== doc.commentCount || (customData.viewCount || 0)*2 < doc.viewCount || customData.likeCount !== doc.likeCount;
+    });
+    await Promise.all(chunk(updatingDocuments, 500).map(docs => 
+      firehose.putRecordBatch({
           DeliveryStreamName: DELIVERY_STREAM_NAME!,
-          Record: {
-            Data: Buffer.from(JSON.stringify(adapt(doc, customData))),
-          },
-        }).promise();
-        updatingDocumentCount += 1;
-      }
-    }
+          Records: docs.map(doc => ({
+            Data: Buffer.from(JSON.stringify(adapt(doc, customDatas[doc.id]))),
+          })),
+      }).promise()));
     saveHistoryCustomData(history, docs);
     /*history.data.customData = JSON.stringify({
       documentIds: uint32ArrayToBase64(docs.map(d => d.id)),
@@ -181,7 +171,7 @@ export class DcinsideWorker implements IWorker {
       commentCounts: uint32ArrayToBase64(docs.map(d => d.commentCount)),
     });*/
     console.log(new Date(), 'crawled documents:', docs.length);
-    console.log(new Date(), 'updating documents:', updatingDocumentCount);
+    console.log(new Date(), 'updating documents:', updatingDocuments.length);
     //const res = Promise.all(chunk(updatingDocuments, 500).map(documents => 
   }
 }

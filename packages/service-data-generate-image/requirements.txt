@@ -5,3 +5,9 @@ scipy
 hdbscan
 umap-learn
 boto3
+git+https://github.com/boudinfl/pke.git
+tokenizers
+soynlp
+soyspacing
+git+https://bitbucket.org/eunjeon/mecab-python-0.996.git
+gensim

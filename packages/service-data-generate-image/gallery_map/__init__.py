@@ -22,20 +22,40 @@ def getGallerySimilaritiesWithUserCount(duration_in_days = 30):
     #mobile_users = ['ㅇㅇ#%s' % ip for ip in mobile_ips]
     cursor.execute(f"""
     WITH cte AS (
-      SELECT 
-        galleryId, 
-        array_agg(distinct coalesce(userId, userNickname || '#' || userIp)) users,
-        filter(array_agg(distinct userId), x -> x IS NOT NULL) staticUsers,
-        filter(array_agg(distinct CASE 
-            WHEN userNickname <> 'ㅇㅇ' AND userIp <> ALL (VALUES {', '.join("'%s'" % ip for ip in mobile_ips)}) THEN 
-                userNickname || '#' || userIp
+	SELECT
+	  galleryId,
+	  array_union(
+	    array_agg(distinct coalesce(userId, userNickname || '#' || userIp)),
+	    array_agg(distinct coalesce(c.userId, c.userNickname || '#' || c.userIp))
+	  ) users,  
+	  filter(array_union(
+	    array_agg(distinct userId),
+	    array_agg(distinct c.userId)
+	  ), x -> x IS NOT NULL) staticUsers,
+	  filter(array_union(
+	    array_agg(DISTINCT CASE 
+	      WHEN userNickname <> 'ㅇㅇ' AND userIp <> ALL (VALUES {', '.join("'%s'" % ip for ip in mobile_ips)}) THEN
+		userNickname || '#' || userIp
+	      ELSE
+		NULL
+	      END),
+	    array_agg(DISTINCT CASE
+	      WHEN c.userNickname <> 'ㅇㅇ' AND c.userIp <> ALL (VALUES {', '.join("'%s'" % ip for ip in mobile_ips)}) THEN
+		c.userNickname || '#' || c.userIp
+	      ELSE
+		NULL
+	      END)
+	  ), x -> x IS NOT NULL) dynamicUsers
+	  FROM cg_dev.dcinside_document
+          CROSS JOIN UNNEST(CASE 
+            WHEN cg_dev.dcinside_document.comments IS NOT NULL 
+              THEN cg_dev.dcinside_document.comments 
             ELSE 
-                NULL
-            END), x -> x IS NOT NULL) dynamicUsers
-      FROM cg_dev.dcinside_document
-      WHERE 
-        dateWithHours >= '{min_date_with_hours}' 
-      GROUP BY 1 
+              ARRAY[NULL] 
+            END) as comm(c)
+	  WHERE
+	    dateWithHours >= '{min_date_with_hours}'        
+	  GROUP BY 1
     )
     SELECT 
       c1.galleryId galleryId1, 
@@ -56,46 +76,6 @@ def getGallerySimilaritiesWithUserCount(duration_in_days = 30):
         cardinality(array_intersect(c1.users, c2.users)) > 10 AND
         cardinality(c1.users) > 100 AND
         cardinality(c2.users) > 100
-      ORDER BY 3 DESC
-      LIMIT 300000;
-    """)
-    print(f"""
-    WITH cte AS (
-      SELECT 
-        galleryId, 
-        -- array_agg(distinct userId) users
-        array_agg(distinct coalesce(userId, userNickname || '#' || userIp)) users,
-        filter(array_agg(distinct userId), x -> x IS NOT NULL) staticUsers,
-        filter(array_agg(distinct CASE 
-            WHEN userNickname <> 'ㅇㅇ' AND userIp <> ALL (VALUES {', '.join("'%s'" % ip for ip in mobile_ips)}) THEN 
-                userNickname || '#' || userIp
-            ELSE 
-                NULL
-            END), x -> x IS NOT NULL) dynamicUsers
-      FROM cg_dev.dcinside_document
-      WHERE 
-        dateWithHours >= '{min_date_with_hours}'
-      GROUP BY 1 
-    )
-    SELECT 
-      c1.galleryId galleryId1, 
-      c2.galleryId galleryId2, 
-      -- cardinality(array_intersect(c1.users, c2.users))*1.0 similarity,
-        (1.0*cardinality(array_intersect(c1.staticUsers, c2.staticUsers))
-        + 0.5*cardinality(array_intersect(c1.dynamicUsers, c2.dynamicUsers))) / 
-          ((cardinality(c1.staticUsers) + cardinality(c2.staticUsers) - 1.0*cardinality(array_intersect(c1.staticUsers, c2.staticUsers)))
-          + (cardinality(c1.dynamicUsers)*0.5 + cardinality(c2.dynamicUsers)*0.5 - cardinality(array_intersect(c1.dynamicUsers, c2.dynamicUsers))*0.5))
-      similarity,
-      cardinality(c1.users) userCount1,
-      cardinality(c2.users) userCount2,
-      cardinality(array_intersect(c1.users, c2.users)) commonUserCount
-      FROM cte AS c1
-      CROSS JOIN cte AS c2 
-      WHERE 
-        c1.galleryId > c2.galleryId AND 
-        cardinality(array_intersect(c1.users, c2.users)) > 10 AND
-        cardinality(c1.users) > 100 AND 
-        cardinality(c2.users) > 100 
       ORDER BY 3 DESC
       LIMIT 300000;
     """)
@@ -157,9 +137,9 @@ def getGalleryMap():
     clusterer = cluster.fit(pos2)
     soft_cluster = hdbscan.all_points_membership_vectors(clusterer)
     soft_cluster_label = [int(np.argmax(x)) for x in soft_cluster]
-    soft_cluster_prob = [int(np.max(x)) for x in soft_cluster]
+    soft_cluster_prob = [float(np.max(x)) for x in soft_cluster]
 
-    area = sum(gallery_user_cardinalities[i])*3
+    area = sum(gallery_user_cardinalities)*4
     radiuses = [(car/area)**0.5 for car in gallery_user_cardinalities]
 
     galleries = [{
@@ -171,7 +151,10 @@ def getGalleryMap():
             'commonUserCount': x[1]
             } for x in sorted(relative_galleries[id], key=lambda x: -x[1])[:10]],
         #'coordinates': [coordinate[ci].tolist() for ci in index_to_scaled_coordinate_index[i]],
-        'node': { 'x': float(pos[i][0]), 'y': float(pos[i][1]), 'r': radiuses[i], 'cluster': soft_cluster_label[i], 'clusterProb': soft_cluster_prob[i], },
+        'cluster': soft_cluster_label[i], 
+        'clusterProbability': soft_cluster_prob[i],
+        'pos': { 'x': float(pos[i][0]), 'y': float(pos[i][1]) }, 
+        'radius': radiuses[i],
         #'cluster': int(cluster.labels_[i]),
         #'softcluster': soft_cluster[i],
         } for i, id in enumerate(gallery_ids)]

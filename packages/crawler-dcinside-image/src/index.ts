@@ -42,7 +42,7 @@ export async function main(){
   }catch(e){
     console.log(e);
   }
-  process.exit(1);
+  //process.exit(1);
 }
 
 if (typeof module !== 'undefined' && !module.parent) {

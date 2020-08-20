@@ -6,8 +6,8 @@ describe('dcinside-crawler', () => {
   it('main', async () => {
     const crawler = new Crawler();
     const gallery = {
-      id: 'programming',
-      isMiner: false,
+      id: 'zkdhfn',
+      isMiner: true,
     };
     let documentHeaders = await crawler.documentHeaders({ gallery, page: 2 });
     expect(documentHeaders.length).toEqual(100)

@@ -1,6 +1,7 @@
 import mobile_ip
 import gallery_index
 import gallery_map
+import keywords
 import datetime
 
 def log(msg):
@@ -11,4 +12,6 @@ log("update mobile ip..")
 log("update gallery index..")
 #gallery_index.put()
 log("update gallery map..")
-gallery_map.put()
+#gallery_map.put()
+log("update keywords..")
+keywords.put()

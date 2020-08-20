@@ -1,6 +1,6 @@
 {
   "name": "@programming-gallery/crawler-dcinside-image",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com/programming-gallery/community-gamification.git",
@@ -35,7 +35,7 @@
   "dependencies": {
     "@aws/dynamodb-data-mapper": "^0.7.3",
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
-    "@programming-gallery/crawler-core": "^0.1.2",
+    "@programming-gallery/crawler-core": "^0.1.3",
     "aws-sdk": "^2.723.0",
     "dcinside-crawler": "0.1.3"
   },

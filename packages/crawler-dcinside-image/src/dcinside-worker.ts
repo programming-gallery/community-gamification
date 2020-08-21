@@ -203,11 +203,11 @@ export class DcinsideWorker implements IWorker {
     }*/
 
     let comments: any[] = [];
-    /*for(let doc of updatingDocuments) {
+    for(let doc of updatingDocuments) {
       let customData = customDatas[doc.id];
       if(customData === undefined || customData.commentCount !== doc.commentCount)
         comments.push(...adaptComments(await this.crawler.comments(doc), customData));
-    }*/
+    }
 
     await Promise.all(chunk(updatingDocuments, 500).map(docs => 
       firehose.putRecordBatch({

@@ -43,10 +43,10 @@ export class DcinsideCrawler extends cdk.Construct {
       stream: dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
     });
     */
-    const comDeliveryStream = new DeliveryStream(scope, id + 'DeliveryStream', {
+    const comDeliveryStream = new DeliveryStream(scope, id + 'CommentDeliveryStream', {
       //vpc,
       //cluster,
-      tableName: 'dcinside_document',
+      tableName: 'dcinside_comment',
       columns: [{
         name: 'galleryId',
         type: glue.Schema.STRING,
@@ -88,7 +88,7 @@ export class DcinsideCrawler extends cdk.Construct {
         type: glue.Schema.BIG_INT,
       }],
     })
-    const docDeliveryStream = new DeliveryStream(scope, id + 'DeliveryStream', {
+    const docDeliveryStream = new DeliveryStream(scope, id + 'DocumentDeliveryStream', {
       //vpc,
       //cluster,
       tableName: 'dcinside_document',
@@ -156,7 +156,7 @@ export class DcinsideCrawler extends cdk.Construct {
       desiredTaskCount,
       environment: {
         //'DOCUMENT_TABLE_NAME': documentTable.tableName,
-        'COMMENT_DELIVERY_STREAM_NAME': comeliveryStream.deliveryStream.deliveryStreamName!,
+        'COMMENT_DELIVERY_STREAM_NAME': comDeliveryStream.deliveryStream.deliveryStreamName!,
         'DOCUMENT_DELIVERY_STREAM_NAME': docDeliveryStream.deliveryStream.deliveryStreamName!,
         'RPS': '30',
         'PRIORITY_WORK_COUNT': '20',
@@ -177,7 +177,8 @@ export class DcinsideCrawler extends cdk.Construct {
 				})]
         */
     })
-    deliveryStream.grantPutRecord(crawler.taskRole);
+    docDeliveryStream.grantPutRecord(crawler.taskRole);
+    comDeliveryStream.grantPutRecord(crawler.taskRole);
     //documentTable.grantReadWriteData(crawler.taskRole);
     const activeGalleryCrawler = new lambda.Function(this, 'ActiveGalleryCrawler', {
       code: lambda.Code.asset(path.join(__dirname, '../../', 'dc-gallery-collect-fn')),

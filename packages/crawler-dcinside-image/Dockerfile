@@ -4,14 +4,16 @@ WORKDIR /srv
 COPY package*.json /srv/
 COPY .npmrc.docker /srv/.npmrc
 ARG GITHUB_TOKEN
-RUN npm set unsafe-perm && npm ci
+#RUN npm set unsafe-perm && npm ci
+RUN npm set unsafe-perm && npm install
 
 COPY tsconfig.json /srv/
 COPY src /srv/src/
 RUN npm run tsc
 
 ARG GITHUB_TOKEN
-RUN npm ci --production
+#RUN npm ci --production
+RUN npm install
 
 FROM alpine:3
 RUN apk add nodejs --no-cache

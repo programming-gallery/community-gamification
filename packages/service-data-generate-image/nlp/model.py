@@ -100,7 +100,7 @@ class Model:
         phrases = Phrases(lines)
         taggedlines = []
         for line, tag in zip(lines, lineIndexTotag):
-            taggedlines.append(TaggedDocument(phrases[line], [tag]))
+            taggedlines.append(TaggedDocument(phrases[line], tag))
         print('d2v input ex:', taggedlines[0])
         print("start doc2vec training..")
         self.doc2vec = Doc2Vec(taggedlines, vector_size=100, window=20, workers=8, dm=0)

@@ -26,6 +26,7 @@ export interface Props {
 export class DeliveryStream extends cdk.Construct {
   deliveryStream: kinesisfirehose.CfnDeliveryStream;
   table: glue.Table;
+
   static bucket: s3.Bucket;
   static workgroup: athena.CfnWorkGroup;
   static database: glue.Database;
@@ -35,10 +36,10 @@ export class DeliveryStream extends cdk.Construct {
     //const { database, tableName, columns, } = props;
     const { tableName, columns, } = props;
     if(DeliveryStream.bucket === undefined){
-      DeliveryStream.bucket = new s3.Bucket(this, 'Bucket', {});
+      DeliveryStream.bucket = new s3.Bucket(scope, 'Bucket', {});
     }
     if(DeliveryStream.workgroup === undefined){
-      DeliveryStream.workgroup = new athena.CfnWorkGroup(this, 'Workgroup', {
+      DeliveryStream.workgroup = new athena.CfnWorkGroup(scope, 'Workgroup', {
         name: scope.toString() + "DDL",
         state: "ENABLED",
         recursiveDeleteOption: true,
@@ -52,7 +53,7 @@ export class DeliveryStream extends cdk.Construct {
       });
     }
     if(DeliveryStream.database === undefined) {
-      DeliveryStream.database = new glue.Database(this, 'GlueDatabase', {
+      DeliveryStream.database = new glue.Database(scope, 'GlueDatabase', {
         databaseName: camelToSnake(scope.toString()),
       });
     }
@@ -207,7 +208,7 @@ export class DeliveryStream extends cdk.Construct {
     bucket.addEventNotification(
       s3.EventType.OBJECT_CREATED, 
       new awsS3Notifications.LambdaDestination(glueTablePartitionUpdateFunction), 
-      { prefix: s3BucketPrefix, suffix: "" });
+      { prefix:`${s3BucketPrefix}${tableName}/`, suffix: "" });
 
     this.deliveryStream = deliveryStream;
     this.table = glueTable;

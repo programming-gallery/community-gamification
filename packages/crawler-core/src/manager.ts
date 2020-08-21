@@ -75,6 +75,10 @@ export class Manager {
     for(let i=0; i<this.priorityWorkCount; ++i){
       try {
         const [message] = await this.priorityQueue.receive(1);
+        if(message === undefined){
+          console.log("no message in priority queue.. skip");
+          break;
+        }
         const contract = JSON.parse(message.Body!);
         const history = await this.HistoryConstructor.getOrCreate(contract.id);
         if(history.isValid(contract.trackingKey)){
@@ -95,6 +99,10 @@ export class Manager {
     for(let i=0; i<this.normalWorkCount; ++i) {
       try {
         const [message] = await this.normalQueue.receive(1);
+        if(message === undefined){
+          console.log("no message in normal queue.. skip");
+          break;
+        }
         const contract = JSON.parse(message.Body!);
         const history = await this.HistoryConstructor.getOrCreate(contract.id);
         if(history.isValid(contract.trackingKey)){

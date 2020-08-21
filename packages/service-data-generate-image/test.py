@@ -15,7 +15,7 @@ if __name__ == "__main__":
     model = Model(override=False)
     model.load(modeldir)
     #print(model.tag('레디컬 페미니스트', stem=True))
-    #print(model.doc2vec.docvecs.most_similar('gotoyome#kgm12345.txt'))
+    print([t for t in model.doc2vec.docvecs.most_similar('hansolgeun', topn=1000)])# if t[0].startswith('gallery')])
     #print(model.doc2vec.docvecs.most_similar(1))
     #print(model.word2vec.wv.most_similar(positive=['이명박#NNP'], negative=[], topn=100))
     #print(model.word2vec.wv.most_similar(positive=['엄마#NNG', '보지#NNG'], negative=['아빠#NNP'], topn=100))

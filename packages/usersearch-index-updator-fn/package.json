@@ -1,0 +1,19 @@
+{
+  "name": "index-updator-fn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "athena-client": "^2.5.1",
+    "axios": "^0.20.0",
+    "pg": "^8.3.3",
+    "pg-copy-streams": "^5.1.1",
+    "stream-transform": "^2.0.2"
+  }
+}

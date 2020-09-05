@@ -13,5 +13,9 @@
     "bootstrap": "lerna bootstrap",
     "test": "lerna run test",
     "install": "lerna bootstrap"
+  },
+  "dependencies": {
+    "meilisearch": "^0.13.0",
+    "parquetjs": "^0.11.2"
   }
 }

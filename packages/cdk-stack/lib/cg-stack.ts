@@ -6,6 +6,7 @@ import * as path from 'path';
 import * as glue from '@aws-cdk/aws-glue';
 import * as s3 from '@aws-cdk/aws-s3';
 import { DcinsideCrawler } from './dcinside-crawler-construct'
+import { ElasticSearch } from './elasticsearch-construct'
 
 
 export class CgStack extends cdk.Stack {
@@ -34,6 +35,11 @@ export class CgStack extends cdk.Stack {
       //glueDatabase,
       //bucket,
       desiredTaskCount: 5,
-    })
+    });
+
+    /*const elasticSearch = new ElasticSearch(this, 'ElasticSearch', {
+      vpc,
+      keyName: 'unist',
+    });*/
   }
 }

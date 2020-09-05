@@ -86,6 +86,9 @@ export class DcinsideCrawler extends cdk.Construct {
       },{
         name: 'parentId',
         type: glue.Schema.BIG_INT,
+      },{
+        name: 'documentId',
+        type: glue.Schema.BIG_INT,
       }],
     })
     const docDeliveryStream = new DeliveryStream(scope, id + 'DocumentDeliveryStream', {

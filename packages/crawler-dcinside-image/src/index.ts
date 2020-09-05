@@ -46,6 +46,7 @@ export async function main(){
   if(!DEBUG) process.exit(1);
 }
 
+
 if (typeof module !== 'undefined' && !module.parent) {
   main();
 } else {

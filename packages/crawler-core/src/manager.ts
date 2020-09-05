@@ -74,6 +74,7 @@ export class Manager {
   async manage() {
     for(let i=0; i<this.priorityWorkCount; ++i){
       try {
+        console.log("fetch from priority queue..");
         const [message] = await this.priorityQueue.receive(1);
         if(message === undefined){
           console.log("no message in priority queue.. skip");
@@ -98,6 +99,7 @@ export class Manager {
     }
     for(let i=0; i<this.normalWorkCount; ++i) {
       try {
+        console.log("fetch from normal queue..");
         const [message] = await this.normalQueue.receive(1);
         if(message === undefined){
           console.log("no message in normal queue.. skip");

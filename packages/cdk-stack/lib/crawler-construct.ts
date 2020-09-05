@@ -109,13 +109,24 @@ export class Crawler extends cdk.Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY, 
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
+    const deadLetterQueue = new sqs.Queue(this, 'DeadLetterQueue', {
+      visibilityTimeout,
+    });
     const priorityQueue = new sqs.Queue(this, 'PriorityQueue', {
       visibilityTimeout,
       deliveryDelay: cdk.Duration.seconds(600),
+      deadLetterQueue: {
+        maxReceiveCount: 3,
+        queue: deadLetterQueue,
+      },
     });
     const normalQueue = new sqs.Queue(this, 'NormalQueue', {
       visibilityTimeout,
       deliveryDelay: cdk.Duration.seconds(600),
+      deadLetterQueue: {
+        maxReceiveCount: 3,
+        queue: deadLetterQueue,
+      },
     });
     const taskDefinition = new ecs.FargateTaskDefinition(this, "TaskDef", {
       memoryLimitMiB,

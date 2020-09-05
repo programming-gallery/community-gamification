@@ -79,8 +79,10 @@ describe('dcinside-worker', () => {
       AWS_CONFIG: JSON.stringify(awsConfig),
       DEBUG: 'true',
     };
-    priorityQueue.send([JSON.stringify({id: 'onceagain#true', trackingKey: 1 })]);
+    //priorityQueue.send([JSON.stringify({id: 'onceagain#true', trackingKey: 1 })]);
+    priorityQueue.send([JSON.stringify({id: 'sfhall#true', trackingKey: 1 })]);
     //normalQueue.send([JSON.stringify({id: 'baseball_new9', trackingKey: 1 })]);
+    await main();
     await main();
     await main();
     /*let docs: Document[] = [];

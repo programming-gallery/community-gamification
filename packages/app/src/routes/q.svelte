@@ -52,7 +52,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each list as doc}
+        {#each list as doc (doc.galleryid + doc.id)}
           <tr class="even:bg-gray-200 w-full whitespace-no-wrap">
             <td class="py-2 text-xs text-left px-2"> <a class="no-underline hover:underline" href={`https://gall.dcinside.com/board/lists?id=${doc.galleryid}`}> {doc.galleryid} </a> </td>
             <td class="align-middle" style="max-width:1px"> 
@@ -87,7 +87,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each list as com}
+        {#each list as com (com.galleryid + com.id)}
           <tr class="even:bg-gray-200 w-full whitespace-no-wrap">
             <td class="py-2 text-xs text-left px-2"> <a class="no-underline hover:underline" href={`https://gall.dcinside.com/board/lists?id=${com.galleryid}`}> {com.galleryid} </a> </td>
             <td class="align-middle" style="max-width:1px"> 
@@ -108,9 +108,3 @@
     </div>
   </li>
 </ul>
-
-<!--
-<div class='content'>
-	{@html documents.html}
-</div>
--->

@@ -6,7 +6,7 @@
       key: query.key, 
       valueType: query.valueType, 
       keyType: query.keyType, 
-      nextTimestamp: list && list[list.length-1].originalcreatedat,
+      nextTimestamp: list.length? list[list.length-1].originalcreatedat : null,
     };
 	}
 
@@ -40,12 +40,10 @@
         <col width="0%" />
         <col width="0%" />
         <col width="0%" />
-        <col width="0%" />
       </colgroup>
       <thead class="text-center">
         <tr class="rounded-lg text-sm border-b"> 
           <th class="py-2">갤러리</th>
-          <!--<th class="">No</th>-->
           <th class="">제목</th>
           <th class="hidden md:table-cell">작성자</th>
           <th class="hidden md:table-cell">조회</th>
@@ -57,7 +55,6 @@
         {#each list as doc}
           <tr class="even:bg-gray-200 w-full whitespace-no-wrap">
             <td class="py-2 text-xs text-left px-2"> <a class="no-underline hover:underline" href={`https://gall.dcinside.com/board/lists?id=${doc.galleryid}`}> {doc.galleryid} </a> </td>
-            <!--<td class="text-xs text-center"> {doc.id} </td>-->
             <td class="align-middle" style="max-width:1px"> 
               <a class="truncate align-middle inline-block no-underline max-w-7/8 hover:underline visited:text-purple-600" href={`https://gall.dcinside.com/board/view/?id=${doc.galleryid}&no=${doc.id}`}
                  title={doc.title}> 
@@ -74,23 +71,16 @@
       </tbody>
     </table>
     {:else if valueType === 'com'}
-    <a class="text-center" on:click={active = 'com'}>
-      댓글
-    </a>
     <table class="table-auto border-collapse w-full text-sm whitespace-no-wrap">
       <colgroup>
         <col width="0%" />
         <col width="100%" />
         <col width="0%" />
         <col width="0%" />
-        <col width="0%" />
-        <col width="0%" />
-        <col width="0%" />
       </colgroup>
       <thead class="">
         <tr class="rounded-lg text-sm border-b"> 
           <th class="py-2">갤러리</th>
-          <!--<th class="">No</th>-->
           <th class="">내용</th>
           <th class="hidden md:table-cell">작성자</th>
           <th class="">시간</th>
@@ -100,7 +90,6 @@
         {#each list as com}
           <tr class="even:bg-gray-200 w-full whitespace-no-wrap">
             <td class="py-2 text-xs text-left px-2"> <a class="no-underline hover:underline" href={`https://gall.dcinside.com/board/lists?id=${com.galleryid}`}> {com.galleryid} </a> </td>
-            <!--<td class="text-xs text-center"> {doc.id} </td>-->
             <td class="align-middle" style="max-width:1px"> 
               <a class="truncate align-middle inline-block no-underline w-full hover:underline visited:text-purple-600" href={`https://gall.dcinside.com/board/view/?id=${com.galleryid}&no=${com.documentid}`}
                  title={com.contents}> 
@@ -114,7 +103,7 @@
       </tbody>
     </table>
     {/if}
-    <div class="text-center bg-gray-300 p-4">
+    <div class="text-center bg-gray-300 p-2">
       <a href="q?keyType={keyType}&valueType={valueType}&key={key}&timestamp={nextTimestamp}" rel=prefetch> 다음 </a>
     </div>
   </li>

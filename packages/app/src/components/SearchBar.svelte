@@ -49,7 +49,7 @@
     <input type="hidden" name="keyType" value={selectedKeyType.keyType} />
     <input type="hidden" name="valueType" value={selectedValueType.valueType} />
     <input bind:value={key} autofocus
-           class="bg-white focus:outline-none focus:shadow-outline border border-gray-300 hover:border-gray-500 rounded-lg py-2 px-4 appearance-none leading-normal"
+           class="bg-white focus:outline-none focus:shadow-outline border border-gray-300 hover:border-gray-500 rounded-lg py-2 px-4 appearance-none leading-normal pr-8"
                   type="search" name="key" placeholder={selectedKeyType.placeholder}>
     <button type="submit" class="absolute inset-y-0 right-0 mr-2 flex items-center px-2 text-gray-700">
       <svg class="text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve" width="512px" height="512px">

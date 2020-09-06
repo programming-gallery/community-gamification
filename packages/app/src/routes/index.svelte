@@ -11,6 +11,6 @@
 </svelte:head>
 
 <div class="flex flex-col items-center">
-  <a href="/"><h1 class="text-xl font-semibold my-16">디글</h1></a>
+  <a href="/"><h1 class="text-6xl font-semibold my-16">디글</h1></a>
   <SearchBar />
 </div>

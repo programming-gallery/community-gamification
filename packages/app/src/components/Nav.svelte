@@ -1,6 +1,5 @@
 <script>
-  import SearchBar from './SearchBar.svelte'
-	export let segment;
+  import SearchBar from './SearchBar.svelte';
   export let keyType;
   export let valueType;
   export let key;

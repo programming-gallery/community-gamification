@@ -6,7 +6,7 @@
       key: query.key, 
       valueType: query.valueType, 
       keyType: query.keyType, 
-      nextTimestamp: list[list.length-1].oldcreatedat,
+      nextTimestamp: list && list[list.length-1].originalcreatedat,
     };
 	}
 
@@ -14,7 +14,7 @@
 
 <script>
   import Nav from '../components/Nav.svelte'
-	export let list;
+	export let list = [];
   export let key;
   export let valueType;
   export let keyType;
@@ -114,7 +114,7 @@
       </tbody>
     </table>
     {/if}
-    <div>
+    <div class="text-center bg-gray-300 p-4">
       <a href="q?keyType={keyType}&valueType={valueType}&key={key}&timestamp={nextTimestamp}" rel=prefetch> 다음 </a>
     </div>
   </li>
